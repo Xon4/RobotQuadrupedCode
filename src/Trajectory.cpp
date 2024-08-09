@@ -12,25 +12,28 @@ Trajectory::Trajectory(float step_length_init, float step_height_init, float bac
     y = 0;
 }
 
-void Trajectory::interpolateNext()
+void Trajectory::interpolateNext(int speed) // speed can be a value from -100 to 100
 {
     if (swing)
     {
-        x += step_length / interpolations;
-        y = step_height * sin(2 * PI / (step_length * 2) * x);
+        x += step_length / (interpolations - ((speed / 100.0) * 5)); // subtract a percent fraction of 5 dependent on the speed from the interpolations, whose default val is 20 (i.e. 20 +- 5 interpolations)
+
         if (x >= step_length)
         {
+            x = step_length;
             swing = false;
         }
+        y = step_height * sin(2 * PI / (step_length * 2) * x); // calculate y value after the conditional so if x exceeds step length, it is set to step length and the y val won't go negative
     }
     else
     {
-        x -= step_length / interpolations;
-        y = -back_step_depth * sin(2 * PI / (step_length * 2) * x);
+        x -= step_length / (interpolations - ((speed / 100.0) * 5));
         if (x <= 0)
         {
+            x = 0;
             swing = true;
         }
+        y = -back_step_depth * sin(2 * PI / (step_length * 2) * x);
     }
 }
 
