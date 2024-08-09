@@ -10,7 +10,7 @@ private:
   float x;
   float y;
   int interpolations = 20;
-  bool forward;
+  bool swing;
   int phase;
 
 public:

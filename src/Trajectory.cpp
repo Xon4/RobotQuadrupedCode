@@ -4,7 +4,7 @@
 Trajectory::Trajectory(float step_length_init, float step_height_init, float back_step_depth_init, int phase_init)
 {
     phase = phase_init;
-    (phase == 1) ? forward = true : forward = false; // legs that are phase 1 will start in forward motion whereas legs that are phase 2 will start in backwards motion
+    (phase == 1) ? swing = true : swing = false; // legs that are phase 1 will start in swing phase whereas legs that are phase 2 will start in support phase
     step_length = step_length_init;
     step_height = step_height_init;
     back_step_depth = back_step_depth_init;
@@ -14,13 +14,13 @@ Trajectory::Trajectory(float step_length_init, float step_height_init, float bac
 
 void Trajectory::interpolateNext()
 {
-    if (forward)
+    if (swing)
     {
         x += step_length / interpolations;
         y = step_height * sin(2 * PI / (step_length * 2) * x);
         if (x >= step_length)
         {
-            forward = false;
+            swing = false;
         }
     }
     else
@@ -29,7 +29,7 @@ void Trajectory::interpolateNext()
         y = -back_step_depth * sin(2 * PI / (step_length * 2) * x);
         if (x <= 0)
         {
-            forward = true;
+            swing = true;
         }
     }
 }

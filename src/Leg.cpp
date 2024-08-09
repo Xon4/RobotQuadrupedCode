@@ -14,8 +14,7 @@ void Leg::updateAngles(int x, int y, int z)
     float d = sqrt(pow(x, 2) + pow(y, 2));
     float alpha = acos((pow(L1, 2) + pow(L2, 2) - pow(d, 2)) / (2 * L1 * L2));
     float theta = 90 + atan(x / y) - asin(L2 * sin(alpha) / d);
-    float phi = alpha - theta;
-    float row = asin(L3 / sqrt(pow(z, 2) + pow(y, 2)));
+    float phi = alpha - theta float row = asin(L3 / sqrt(pow(z, 2) + pow(y, 2)));
     float omega = row - atan(y / z);
     abad_angle = omega;
     hip_angle = theta;

@@ -14,7 +14,7 @@ private:
   Adafruit_PWMServoDriver pwm;
   const int L1 = 120;
   const int L2 = 120;
-  const int L3 = 20; 
+  const int L3 = 20;
 
 public:
   Leg(Adafruit_PWMServoDriver &pwm_init, int abad_servo_init, int hip_servo_init, int knee_servo_init);

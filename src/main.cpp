@@ -77,4 +77,3 @@ void loop()
 
     prev_time = current_time;
   }
-}
