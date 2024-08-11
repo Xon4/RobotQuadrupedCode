@@ -22,6 +22,9 @@ int BL_abad = 10;
 int BL_hip = 11;
 int BL_knee = 12;
 
+//speed var declaration
+int speed = 100; 
+
 // timer declerations
 unsigned long current_time = 0;
 unsigned long prev_time = 0;
@@ -60,10 +63,10 @@ void loop()
 
   if (abs(current_time - prev_time) >= millis_delay)
   {
-    FR_trajectory.interpolateNext();
-    FL_trajectory.interpolateNext();
-    BL_trajectory.interpolateNext();
-    BR_trajectory.interpolateNext();
+    FR_trajectory.interpolateNext(speed);
+    FL_trajectory.interpolateNext(speed);
+    BL_trajectory.interpolateNext(speed);
+    BR_trajectory.interpolateNext(speed);
 
     FR_leg.updateAngles(FR_trajectory.get_x(), FR_trajectory.get_y(), 0);
     FL_leg.updateAngles(FR_trajectory.get_x(), FR_trajectory.get_y(), 0);
@@ -77,3 +80,4 @@ void loop()
 
     prev_time = current_time;
   }
+}
