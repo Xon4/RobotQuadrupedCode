@@ -21,10 +21,10 @@ FL_abadPos = [-50, 150, 0]
 BR_abadPos = [50, -150, 0]
 BL_abadPos = [-50, -150, 0]
 
-
 L1 = 120
 L2 = 120
 L3 = 50
+num = 0
 
 def drawBody():
     ax.plot([0, 0], [-150, 150], [0, 0], color="blue")
@@ -46,7 +46,7 @@ class Trajectory:
             self.y = STEP_LENGTH
             self.z = 0
         self.interpolations = 20
-    def interpolate(self, speed): 
+    def interpolate(self, speed): #returns whether the leg is stable or not (i.e. leg is touching the ground)
         # speed should be between 0 and 100
         if self.dir == "forward":
             rate = STEP_LENGTH / (self.interpolations - (speed / 100.0 * 18))
@@ -104,7 +104,14 @@ class Trajectory:
                     self.x = SIDE_STEP_LENGTH/2
                     self.phase = "swing"
                 self.z = -SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH/2)) - GROUND_DEPTH
-        
+        elif self.dir == "left_turn":
+            rate = SIDE_STEP_LENGTH / (self.interpolations - (speed / 100.0 * 18))
+            if self.leg == "swing":
+                self.x -= rate
+        if abs(self.z + GROUND_DEPTH) < 2 and self.x == 0 and self.y == 0:
+            return True
+        return False
+                
     def set_dir(self, dir_val):
         self.dir = dir_val
         if self.dir == "forward" or self.dir == "backward":
@@ -129,14 +136,19 @@ class Trajectory:
                 self.x = SIDE_STEP_LENGTH/2
                 self.y = 0
                 self.z = 0
-        elif self.dir == "left_turn" or self.dir == "right_turn":
-            if self.leg == "FR" or  self.leg == "BL":
-                self.phase = "swing"
-                self.x = 0
-                self.y = 0
-                self.z = 0
+                
+        # elif self.dir == "left_turn" or self.dir == "right_turn":
+        #     if self.leg == "FR"
+        #         self.phase = "swing"
+        #         self.x = -SIDE_STEP_LENGTH/2
+        #         self.y = 0
+        #         self.z = 0
+        #     elif self.leg == "FL" or self.leg == "BR":
+        #         self.phase = "support"
+        #         self.x = SIDE_STEP_LENGTH/2
+        #         self.y = 0
+        #         self.z = 0
             
-      
             
     def get_x(self):
         return self.x
@@ -144,7 +156,6 @@ class Trajectory:
         return self.y
     def get_z(self):
         return self.z
-    
     
 def solveIK(targetPos, abadPos): 
     x = targetPos[0]-abadPos[0]
@@ -164,7 +175,9 @@ def solveIK(targetPos, abadPos):
         omega = sigma - math.pi/2
     return [omega, theta, phi] #abad angle, hip angle, knee angle
 
-    
+
+
+
 def animate(frame):
     ax.cla()
     ax.set_xlim(-300,300)
@@ -175,10 +188,10 @@ def animate(frame):
     ax.set_zlabel('Z axis')
     
     drawBody() 
-    FR_trajectory.interpolate(GAIT_SPEED)
-    FL_trajectory.interpolate(GAIT_SPEED)
-    BR_trajectory.interpolate(GAIT_SPEED)
-    BL_trajectory.interpolate(GAIT_SPEED)
+    FR_state = FR_trajectory.interpolate(GAIT_SPEED)
+    FL_state = FL_trajectory.interpolate(GAIT_SPEED)
+    BR_state = BR_trajectory.interpolate(GAIT_SPEED)
+    BL_state = BL_trajectory.interpolate(GAIT_SPEED)
     
     FR_footPos = translateTrajectory([FR_trajectory.get_x(), FR_trajectory.get_y(), FR_trajectory.get_z()], "FR")
     FL_footPos = translateTrajectory([FL_trajectory.get_x(), FL_trajectory.get_y(), FL_trajectory.get_z()], "FL")
@@ -189,8 +202,6 @@ def animate(frame):
     FL_angles = solveIK(FL_footPos, FL_abadPos)
     BR_angles = solveIK(BR_footPos, BR_abadPos)
     BL_angles = solveIK(BL_footPos, BL_abadPos)
-    
-    print(FL_angles)
    
     #forward kinematics to find hip joint pos
     FR_hipPos = [FR_abadPos[0] + L3*math.cos(FR_angles[0]), FR_abadPos[1], FR_abadPos[2] + L3*math.sin(FR_angles[0])]
@@ -228,6 +239,20 @@ def animate(frame):
     # ax.plot([0, BR_footPos[0]], [0, BR_footPos[1]], [0, BR_footPos[2]])
     # ax.plot([0, BL_footPos[0]], [0, BL_footPos[1]], [0, BL_footPos[2]])
     
+    global num
+    if FR_state:
+        num += 1
+    if num == 5:
+        FR_trajectory.set_dir("left")
+        FL_trajectory.set_dir("left")
+        BR_trajectory.set_dir("left")
+        BL_trajectory.set_dir("left")
+    elif num == 10:
+        FR_trajectory.set_dir("forward")
+        FL_trajectory.set_dir("forward")
+        BR_trajectory.set_dir("forward")
+        BL_trajectory.set_dir("forward")
+
     
 def translateTrajectory(pos, leg):
     if leg == "FR":
@@ -248,10 +273,10 @@ FR_trajectory = Trajectory("FR")
 FL_trajectory = Trajectory("FL")
 BR_trajectory = Trajectory("BR")
 BL_trajectory = Trajectory("BL")
-FR_trajectory.set_dir("left")
-FL_trajectory.set_dir("left")
-BR_trajectory.set_dir("left")
-BL_trajectory.set_dir("left")
+FR_trajectory.set_dir("forward")
+FL_trajectory.set_dir("forward")
+BR_trajectory.set_dir("forward")
+BL_trajectory.set_dir("forward")
 
 
 ani = animation.FuncAnimation(fig, animate, frames=200, interval=50)
