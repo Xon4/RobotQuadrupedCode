@@ -97,16 +97,16 @@ class Trajectory:
             rate = SIDE_STEP_LENGTH / (self.interpolations - (speed / 100.0 * 18))
             if self.phase == "swing":
                 self.x -= rate
-                if self.x <= 0:
-                    self.x = 0
+                if self.x <= -SIDE_STEP_LENGTH:
+                    self.x = -SIDE_STEP_LENGTH
                     self.phase = "support"
-                self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
+                self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
             elif self.phase == "support":
                 self.x += rate
-                if self.x >= SIDE_STEP_LENGTH:
-                    self.x = SIDE_STEP_LENGTH
+                if self.x >= 0:
+                    self.x = 0
                     self.phase = "swing"
-                self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
+                self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
         
     def set_dir(self, dir_val):
         self.dir = dir_val
@@ -121,8 +121,8 @@ class Trajectory:
                 self.x = 0
                 self.y = STEP_LENGTH
                 self.z = 0
-                
-        elif self.dir == "left" or self.dir == "right":
+        
+        elif self.dir == "right":
             if self.leg == "FR" or self.leg == "BL":
                 self.phase = "swing"
                 self.x = 0
@@ -131,6 +131,18 @@ class Trajectory:
             elif self.leg == "FL" or self.leg == "BR":
                 self.phase = "support"
                 self.x = SIDE_STEP_LENGTH
+                self.y = 0
+                self.z = 0
+                
+        elif self.dir == "left":
+            if self.leg == "FR" or self.leg == "BL":
+                self.phase = "swing"
+                self.x = 0
+                self.y = 0
+                self.z = 0
+            elif self.leg == "FL" or self.leg == "BR":
+                self.phase = "support"
+                self.x = -SIDE_STEP_LENGTH
                 self.y = 0
                 self.z = 0
       
@@ -186,8 +198,6 @@ def animate(frame):
     FL_angles = solveIK(FL_footPos, FL_abadPos)
     BR_angles = solveIK(BR_footPos, BR_abadPos)
     BL_angles = solveIK(BL_footPos, BL_abadPos)
-    
-    print(FL_angles)
    
     #forward kinematics to find hip joint pos
     FR_hipPos = [FR_abadPos[0] + L3*math.cos(FR_angles[0]), FR_abadPos[1], FR_abadPos[2] + L3*math.sin(FR_angles[0])]
