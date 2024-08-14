@@ -7,11 +7,11 @@ import time
 #declare constants
 STEP_LENGTH = 50
 STEP_HEIGHT = 30
-BACK_STEP_DEPTH = 5
+BACK_STEP_DEPTH = 10
 
-SIDE_STEP_LENGTH = 20
-SIDE_STEP_HEIGHT = 20
-SIDE_BACK_STEP_DEPTH = 5
+SIDE_STEP_LENGTH = 50
+SIDE_STEP_HEIGHT = 30
+SIDE_BACK_STEP_DEPTH = 10
 
 GROUND_DEPTH = 200
 GAIT_SPEED = 80
@@ -62,7 +62,6 @@ class Trajectory:
                     self.y = 0
                     self.phase = "swing"
                 self.z = -BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * self.y) - GROUND_DEPTH
-        
         elif self.dir == "backward":
             rate = STEP_LENGTH / (self.interpolations - (speed / 100.0 * 18))
             if self.phase == "swing":
@@ -77,36 +76,34 @@ class Trajectory:
                     self.y = STEP_LENGTH
                     self.phase = "swing"
                 self.z = -BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * self.y) - GROUND_DEPTH
-       
         elif self.dir == "right":
             rate = SIDE_STEP_LENGTH / (self.interpolations - (speed / 100.0 * 18))
             if self.phase == "swing":
                 self.x += rate
-                if self.x >= SIDE_STEP_LENGTH:
-                    self.x = SIDE_STEP_LENGTH
+                if self.x >= SIDE_STEP_LENGTH/2:
+                    self.x = SIDE_STEP_LENGTH/2
                     self.phase = "support"
-                self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
+                self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH/2)) - GROUND_DEPTH
             elif self.phase == "support":
                 self.x -= rate
-                if self.x <= 0:
-                    self.x = 0
+                if self.x <= -SIDE_STEP_LENGTH/2:
+                    self.x = -SIDE_STEP_LENGTH/2
                     self.phase = "swing"
-                self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
-        
+                self.z = -SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * (self.x + SIDE_STEP_HEIGHT/2)) - GROUND_DEPTH
         elif self.dir == "left":
             rate = SIDE_STEP_LENGTH / (self.interpolations - (speed / 100.0 * 18))
             if self.phase == "swing":
                 self.x -= rate
-                if self.x <= 0:
-                    self.x = 0
+                if self.x <= -SIDE_STEP_LENGTH/2:
+                    self.x = -SIDE_STEP_LENGTH/2
                     self.phase = "support"
-                self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
+                self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH/2)) - GROUND_DEPTH
             elif self.phase == "support":
                 self.x += rate
-                if self.x >= SIDE_STEP_LENGTH:
-                    self.x = SIDE_STEP_LENGTH
+                if self.x >= SIDE_STEP_LENGTH/2:
+                    self.x = SIDE_STEP_LENGTH/2
                     self.phase = "swing"
-                self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
+                self.z = -SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH/2)) - GROUND_DEPTH
         
     def set_dir(self, dir_val):
         self.dir = dir_val
@@ -121,18 +118,24 @@ class Trajectory:
                 self.x = 0
                 self.y = STEP_LENGTH
                 self.z = 0
-                
         elif self.dir == "left" or self.dir == "right":
             if self.leg == "FR" or self.leg == "BL":
                 self.phase = "swing"
-                self.x = 0
+                self.x = -SIDE_STEP_LENGTH/2
                 self.y = 0
                 self.z = 0
             elif self.leg == "FL" or self.leg == "BR":
                 self.phase = "support"
-                self.x = SIDE_STEP_LENGTH
+                self.x = SIDE_STEP_LENGTH/2
                 self.y = 0
                 self.z = 0
+        elif self.dir == "left_turn" or self.dir == "right_turn":
+            if self.leg == "FR" or  self.leg == "BL":
+                self.phase = "swing"
+                self.x = 0
+                self.y = 0
+                self.z = 0
+            
       
             
     def get_x(self):
