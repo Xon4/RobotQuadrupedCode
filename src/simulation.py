@@ -2,6 +2,7 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+from matplotlib.widgets import Slider
 import time
 
 #declare constants
@@ -13,8 +14,8 @@ SIDE_STEP_LENGTH = 20
 SIDE_STEP_HEIGHT = 20
 SIDE_BACK_STEP_DEPTH = 5
 
-GROUND_DEPTH = 200
 GAIT_SPEED = 80
+GROUND_DEPTH = 200
 
 FR_abadPos = [50, 150, 0]
 FL_abadPos = [-50, 150, 0]
@@ -184,10 +185,11 @@ def animate(frame):
     ax.set_zlabel('Z axis')
     
     drawBody() 
-    FR_trajectory.interpolate(GAIT_SPEED)
-    FL_trajectory.interpolate(GAIT_SPEED)
-    BR_trajectory.interpolate(GAIT_SPEED)
-    BL_trajectory.interpolate(GAIT_SPEED)
+    gaitSpeed = speedSlider.val
+    FR_trajectory.interpolate(gaitSpeed)
+    FL_trajectory.interpolate(gaitSpeed)
+    BR_trajectory.interpolate(gaitSpeed)
+    BL_trajectory.interpolate(gaitSpeed)
     
     FR_footPos = translateTrajectory([FR_trajectory.get_x(), FR_trajectory.get_y(), FR_trajectory.get_z()], "FR")
     FL_footPos = translateTrajectory([FL_trajectory.get_x(), FL_trajectory.get_y(), FL_trajectory.get_z()], "FL")
@@ -255,13 +257,15 @@ FR_trajectory = Trajectory("FR")
 FL_trajectory = Trajectory("FL")
 BR_trajectory = Trajectory("BR")
 BL_trajectory = Trajectory("BL")
-FR_trajectory.set_dir("left")
-FL_trajectory.set_dir("left")
-BR_trajectory.set_dir("left")
-BL_trajectory.set_dir("left")
+FR_trajectory.set_dir("forward")
+FL_trajectory.set_dir("forward")
+BR_trajectory.set_dir("forward")
+BL_trajectory.set_dir("forward")
 
 
 ani = animation.FuncAnimation(fig, animate, frames=200, interval=50)
+axSlider = plt.axes([0.25, 0, 0.65, 0.03], facecolor='lightgoldenrodyellow')
+speedSlider = Slider(axSlider, 'Gait Speed', 0, 100, valinit=GAIT_SPEED)
 
 # Show the plot
 plt.show()
