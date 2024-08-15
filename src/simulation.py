@@ -109,6 +109,116 @@ class Trajectory:
                     self.phase = "swing"
                 self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
         
+        elif self.dir == "right_turn":
+            rate = SIDE_STEP_LENGTH / (self.interpolations - (speed / 100.0 * 18))
+            if self.leg == "FR":
+                if self.phase == "swing":
+                    self.x += rate
+                    if self.x >= SIDE_STEP_LENGTH:
+                        self.x = SIDE_STEP_LENGTH
+                        self.phase = "support"
+                    self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
+                elif self.phase == "support":
+                    self.x -= rate
+                    if self.x <= 0:
+                        self.x = 0
+                        self.phase = "swing"
+                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
+            elif self.leg == "FL":
+                if self.phase == "swing":
+                    self.x += rate
+                    if self.x >= 0:
+                        self.x = 0
+                        self.phase = "support"
+                    self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
+                elif self.phase == "support":
+                    self.x -= rate
+                    if self.x <= -SIDE_STEP_LENGTH:
+                        self.x = -SIDE_STEP_LENGTH
+                        self.phase = "swing"
+                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
+            elif self.leg == "BR":
+                if self.phase == "swing":
+                    self.x -= rate
+                    if self.x <= 0:
+                        self.x = 0
+                        self.phase = "support"
+                    self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
+                elif self.phase == "support":
+                    self.x += rate
+                    if self.x >= SIDE_STEP_LENGTH:
+                        self.x = SIDE_STEP_LENGTH
+                        self.phase = "swing"
+                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
+            elif self.leg == "BL":
+                if self.phase == "swing":
+                    self.x -= rate
+                    if self.x <= -SIDE_STEP_LENGTH:
+                        self.x = -SIDE_STEP_LENGTH
+                        self.phase = "support"
+                    self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
+                elif self.phase == "support":
+                    self.x += rate
+                    if self.x >= 0:
+                        self.x = 0
+                        self.phase = "swing"
+                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
+            
+        elif self.dir == "left_turn":
+            rate = SIDE_STEP_LENGTH / (self.interpolations - (speed / 100.0 * 18))
+            if self.leg == "FR":
+                if self.phase == "swing":
+                    self.x -= rate
+                    if self.x <= 0:
+                        self.x = 0
+                        self.phase = "support"
+                    self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
+                elif self.phase == "support":
+                    self.x += rate
+                    if self.x >= SIDE_STEP_LENGTH:
+                        self.x = SIDE_STEP_LENGTH
+                        self.phase = "swing"
+                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
+            elif self.leg == "FL":
+                if self.phase == "swing":
+                    self.x -= rate
+                    if self.x <= -SIDE_STEP_LENGTH:
+                        self.x = -SIDE_STEP_LENGTH
+                        self.phase = "support"
+                    self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
+                elif self.phase == "support":
+                    self.x += rate
+                    if self.x >= 0:
+                        self.x = 0
+                        self.phase = "swing"
+                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
+            elif self.leg == "BR":
+                if self.phase == "swing":
+                    self.x += rate
+                    if self.x >= SIDE_STEP_LENGTH:
+                        self.x = SIDE_STEP_LENGTH
+                        self.phase = "support"
+                    self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
+                elif self.phase == "support":
+                    self.x -= rate
+                    if self.x <= 0:
+                        self.x = 0
+                        self.phase = "swing"
+                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
+            elif self.leg == "BL":
+                if self.phase == "swing":
+                    self.x += rate
+                    if self.x >= 0:
+                        self.x = 0
+                        self.phase = "support"
+                    self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
+                elif self.phase == "support":
+                    self.x -= rate
+                    if self.x <= -SIDE_STEP_LENGTH:
+                        self.x = -SIDE_STEP_LENGTH
+                        self.phase = "swing"
+                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
+        
     def set_dir(self, dir_val):
         self.dir = dir_val
         if self.dir == "forward" or self.dir == "backward":
@@ -122,7 +232,6 @@ class Trajectory:
                 self.x = 0
                 self.y = STEP_LENGTH
                 self.z = 0
-        
         elif self.dir == "right":
             if self.leg == "FR" or self.leg == "BL":
                 self.phase = "swing"
@@ -134,7 +243,6 @@ class Trajectory:
                 self.x = SIDE_STEP_LENGTH
                 self.y = 0
                 self.z = 0
-                
         elif self.dir == "left":
             if self.leg == "FR" or self.leg == "BL":
                 self.phase = "swing"
@@ -146,7 +254,28 @@ class Trajectory:
                 self.x = -SIDE_STEP_LENGTH
                 self.y = 0
                 self.z = 0
-      
+        elif self.dir == "right_turn":
+            if self.leg == "FR" or self.leg == "BL":
+                self.phase = "swing"
+                self.x = 0
+                self.y = 0
+                self.z = 0
+            elif self.leg == "FL" or self.leg == "BR":
+                self.phase = "support"
+                self.x = 0
+                self.y = 0
+                self.z = 0 
+        elif self.dir == "left_turn":
+            if self.leg == "FL" or self.leg == "BR":
+                self.phase = "swing"
+                self.x = 0
+                self.y = 0
+                self.z = 0
+            elif self.leg == "FR" or self.leg == "BL":
+                self.phase = "support"
+                self.x = 0
+                self.y = 0
+                self.z = 0
             
     def get_x(self):
         return self.x
@@ -257,10 +386,10 @@ FR_trajectory = Trajectory("FR")
 FL_trajectory = Trajectory("FL")
 BR_trajectory = Trajectory("BR")
 BL_trajectory = Trajectory("BL")
-FR_trajectory.set_dir("forward")
-FL_trajectory.set_dir("forward")
-BR_trajectory.set_dir("forward")
-BL_trajectory.set_dir("forward")
+FR_trajectory.set_dir("left_turn")
+FL_trajectory.set_dir("left_turn")
+BR_trajectory.set_dir("left_turn")
+BL_trajectory.set_dir("left_turn")
 
 
 ani = animation.FuncAnimation(fig, animate, frames=200, interval=50)
