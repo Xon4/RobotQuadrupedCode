@@ -276,6 +276,10 @@ class Trajectory:
                 self.x = 0
                 self.y = 0
                 self.z = 0
+    def posControl(self, pos): #pos is a list [x,y,z] where each element is between 0 and 100
+        self.x = pos[0]/100.0 * 30
+        self.y = pos[1]/100.0 * 30
+        self.z = -GROUND_DEPTH - pos[2]/100.0 * 30
             
     def get_x(self):
         return self.x
@@ -314,11 +318,16 @@ def animate(frame):
     ax.set_zlabel('Z axis')
     
     drawBody() 
-    gaitSpeed = speedSlider.val
-    FR_trajectory.interpolate(gaitSpeed)
-    FL_trajectory.interpolate(gaitSpeed)
-    BR_trajectory.interpolate(gaitSpeed)
-    BL_trajectory.interpolate(gaitSpeed)
+    #gaitSpeed = speedSlider.val
+    
+    # FR_trajectory.interpolate(gaitSpeed)
+    # FL_trajectory.interpolate(gaitSpeed)
+    # BR_trajectory.interpolate(gaitSpeed)
+    # BL_trajectory.interpolate(gaitSpeed)
+    FR_trajectory.posControl([xSlider.val,ySlider.val,zSlider.val])
+    FL_trajectory.posControl([xSlider.val,ySlider.val,zSlider.val])
+    BR_trajectory.posControl([xSlider.val,ySlider.val,zSlider.val])
+    BL_trajectory.posControl([xSlider.val,ySlider.val,zSlider.val])
     
     FR_footPos = translateTrajectory([FR_trajectory.get_x(), FR_trajectory.get_y(), FR_trajectory.get_z()], "FR")
     FL_footPos = translateTrajectory([FL_trajectory.get_x(), FL_trajectory.get_y(), FL_trajectory.get_z()], "FL")
@@ -386,15 +395,22 @@ FR_trajectory = Trajectory("FR")
 FL_trajectory = Trajectory("FL")
 BR_trajectory = Trajectory("BR")
 BL_trajectory = Trajectory("BL")
-FR_trajectory.set_dir("left_turn")
-FL_trajectory.set_dir("left_turn")
-BR_trajectory.set_dir("left_turn")
-BL_trajectory.set_dir("left_turn")
+# FR_trajectory.set_dir("left_turn")
+# FL_trajectory.set_dir("left_turn")
+# BR_trajectory.set_dir("left_turn")
+# BL_trajectory.set_dir("left_turn")
 
 
 ani = animation.FuncAnimation(fig, animate, frames=200, interval=50)
-axSlider = plt.axes([0.25, 0, 0.65, 0.03], facecolor='lightgoldenrodyellow')
-speedSlider = Slider(axSlider, 'Gait Speed', 0, 100, valinit=GAIT_SPEED)
+# axSlider = plt.axes([0.25, 0, 0.65, 0.03], facecolor='lightgoldenrodyellow')
+# speedSlider = Slider(axSlider, 'Gait Speed', 0, 100, valinit=GAIT_SPEED)
+xAxSlider = plt.axes([0.25, 0.1, 0.65, 0.03], facecolor='lightgoldenrodyellow')
+yAxSlider = plt.axes([0.25, 0.05, 0.65, 0.03], facecolor='lightgoldenrodyellow')
+zAxSlider = plt.axes([0.25, 0, 0.65, 0.03], facecolor='lightgoldenrodyellow')
+
+xSlider = Slider(xAxSlider, 'xPos', -100, 100, valinit=0)
+ySlider = Slider(yAxSlider, 'yPos', -100, 100, valinit=0)
+zSlider = Slider(zAxSlider, 'zPos', -100, 100, valinit=0)
 
 # Show the plot
 plt.show()
