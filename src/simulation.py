@@ -276,10 +276,14 @@ class Trajectory:
                 self.x = 0
                 self.y = 0
                 self.z = 0
+
     def posControl(self, pos): #pos is a list [x,y,z] where each element is between 0 and 100
-        self.x = pos[0]/100.0 * 30
-        self.y = pos[1]/100.0 * 30
-        self.z = -GROUND_DEPTH - pos[2]/100.0 * 30
+        self.x = pos[0]/100.0 * 25
+        self.y = pos[1]/100.0 * 25
+        self.z = -GROUND_DEPTH - pos[2]/100.0 * 25
+        
+    #def orientControl(self, orient):
+        
             
     def get_x(self):
         return self.x
@@ -395,10 +399,10 @@ FR_trajectory = Trajectory("FR")
 FL_trajectory = Trajectory("FL")
 BR_trajectory = Trajectory("BR")
 BL_trajectory = Trajectory("BL")
-# FR_trajectory.set_dir("left_turn")
-# FL_trajectory.set_dir("left_turn")
-# BR_trajectory.set_dir("left_turn")
-# BL_trajectory.set_dir("left_turn")
+FR_trajectory.set_dir("left_turn")
+FL_trajectory.set_dir("left_turn")
+BR_trajectory.set_dir("left_turn")
+BL_trajectory.set_dir("left_turn")
 
 
 ani = animation.FuncAnimation(fig, animate, frames=200, interval=50)
