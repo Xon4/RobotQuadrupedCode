@@ -277,10 +277,32 @@ class Trajectory:
                 self.y = 0
                 self.z = 0
 
-    def posControl(self, pos): #pos is a list [x,y,z] where each element is between 0 and 100
-        self.x = pos[0]/100.0 * 25
-        self.y = pos[1]/100.0 * 25
+    def posControl(self, pos): #pos is a list [x, y, z] where each element is between 0 and 100
+        self.x = -pos[0]/100.0 * 25
+        self.y = -pos[1]/100.0 * 25
         self.z = -GROUND_DEPTH - pos[2]/100.0 * 25
+        
+    def orientControl(self, orient): #orient is a list [roll, pitch, yaw] where each element is between 0 and 100
+        alpha = math.pi/12 * orient[2]/100.0
+        d = 150*math.sqrt(2*(1-math.cos(alpha))) 
+        if alpha < 0:
+            d *= -1
+        if self.leg == "FR":
+            self.x = d*math.cos(alpha/2)
+            self.y = -d*math.sin(alpha/2)
+            self.z = -GROUND_DEPTH + 50*math.sin(math.pi/24 * orient[0]/100.0) + 150*math.sin(math.pi/24 * orient[1]/100.0)
+        elif self.leg == "FL":
+            self.x = d*math.cos(alpha/2)
+            self.y = -d*math.sin(alpha/2)
+            self.z = -GROUND_DEPTH - 50*math.sin(math.pi/24 * orient[0]/100.0) + 150*math.sin(math.pi/24 * orient[1]/100.0)
+        elif self.leg == "BR":
+            self.x = -d*math.cos(alpha/2)
+            self.y = d*math.sin(alpha/2)
+            self.z = -GROUND_DEPTH + 50*math.sin(math.pi/24 * orient[0]/100.0) - 150*math.sin(math.pi/24 * orient[1]/100.0)
+        elif self.leg == "BL":
+            self.x = -d*math.cos(alpha/2)
+            self.y = d*math.sin(alpha/2)
+            self.z = -GROUND_DEPTH - 50*math.sin(math.pi/24 * orient[0]/100.0) - 150*math.sin(math.pi/24 * orient[1]/100.0)
         
     #def orientControl(self, orient):
         
@@ -328,16 +350,24 @@ def animate(frame):
     # FL_trajectory.interpolate(gaitSpeed)
     # BR_trajectory.interpolate(gaitSpeed)
     # BL_trajectory.interpolate(gaitSpeed)
-    FR_trajectory.posControl([xSlider.val,ySlider.val,zSlider.val])
-    FL_trajectory.posControl([xSlider.val,ySlider.val,zSlider.val])
-    BR_trajectory.posControl([xSlider.val,ySlider.val,zSlider.val])
-    BL_trajectory.posControl([xSlider.val,ySlider.val,zSlider.val])
+    FR_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
+    FL_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
+    BR_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
+    BL_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
     
+    #end effector positions
     FR_footPos = translateTrajectory([FR_trajectory.get_x(), FR_trajectory.get_y(), FR_trajectory.get_z()], "FR")
     FL_footPos = translateTrajectory([FL_trajectory.get_x(), FL_trajectory.get_y(), FL_trajectory.get_z()], "FL")
     BR_footPos = translateTrajectory([BR_trajectory.get_x(), BR_trajectory.get_y(), BR_trajectory.get_z()], "BR")
     BL_footPos = translateTrajectory([BL_trajectory.get_x(), BL_trajectory.get_y(), BL_trajectory.get_z()], "BL")
     
+    #draw feet as points
+    ax.scatter(FR_footPos[0], FR_footPos[1], FR_footPos[2], color='black', s=100, label='Point')
+    ax.scatter(FL_footPos[0], FL_footPos[1], FL_footPos[2], color='black', s=100, label='Point')
+    ax.scatter(BR_footPos[0], BR_footPos[1], BR_footPos[2], color='black', s=100, label='Point')
+    ax.scatter(BL_footPos[0], BL_footPos[1], BL_footPos[2], color='black', s=100, label='Point')
+    
+    #IK to solve for angles in joint space
     FR_angles = solveIK(FR_footPos, FR_abadPos)
     FL_angles = solveIK(FL_footPos, FL_abadPos)
     BR_angles = solveIK(BR_footPos, BR_abadPos)
@@ -408,13 +438,13 @@ BL_trajectory.set_dir("left_turn")
 ani = animation.FuncAnimation(fig, animate, frames=200, interval=50)
 # axSlider = plt.axes([0.25, 0, 0.65, 0.03], facecolor='lightgoldenrodyellow')
 # speedSlider = Slider(axSlider, 'Gait Speed', 0, 100, valinit=GAIT_SPEED)
-xAxSlider = plt.axes([0.25, 0.1, 0.65, 0.03], facecolor='lightgoldenrodyellow')
-yAxSlider = plt.axes([0.25, 0.05, 0.65, 0.03], facecolor='lightgoldenrodyellow')
-zAxSlider = plt.axes([0.25, 0, 0.65, 0.03], facecolor='lightgoldenrodyellow')
+rollAxSlider = plt.axes([0.25, 0.1, 0.65, 0.03], facecolor='lightgoldenrodyellow')
+pitchAxSlider = plt.axes([0.25, 0.05, 0.65, 0.03], facecolor='lightgoldenrodyellow')
+yawAxSlider = plt.axes([0.25, 0, 0.65, 0.03], facecolor='lightgoldenrodyellow')
 
-xSlider = Slider(xAxSlider, 'xPos', -100, 100, valinit=0)
-ySlider = Slider(yAxSlider, 'yPos', -100, 100, valinit=0)
-zSlider = Slider(zAxSlider, 'zPos', -100, 100, valinit=0)
+rollSlider = Slider(rollAxSlider, 'rollPos', -100, 100, valinit=0)
+pitchSlider = Slider(pitchAxSlider, 'pitchPos', -100, 100, valinit=0)
+yawSlider = Slider(yawAxSlider, 'yawPos', -100, 100, valinit=0)
 
 # Show the plot
 plt.show()
