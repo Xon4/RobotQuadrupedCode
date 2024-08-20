@@ -47,6 +47,7 @@ class Trajectory:
             self.y = STEP_LENGTH
             self.z = 0
         self.interpolations = 20
+    
     def interpolate(self, speed): 
         # speed should be between 0 and 100
         if self.dir == "forward":
@@ -218,8 +219,11 @@ class Trajectory:
                         self.x = -SIDE_STEP_LENGTH
                         self.phase = "swing"
                     self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
+    
+    def checkGrounded(self):
+        return (self.x == 0 and self.y == 0 and self.z == -GROUND_DEPTH)
         
-    def set_dir(self, dir_val):
+    def setDir(self, dir_val):
         self.dir = dir_val
         if self.dir == "forward" or self.dir == "backward":
             if self.leg == "FR" or self.leg == "BL":
@@ -276,6 +280,13 @@ class Trajectory:
                 self.x = 0
                 self.y = 0
                 self.z = 0
+        elif self.dir == "still":
+            self.x = 0
+            self.y = 0
+            self.z = 0
+    
+    def getDir(self):
+        return self.dir
 
     def posControl(self, pos): #pos is a list [x, y, z] where each element is between 0 and 100
         self.x = -pos[0]/100.0 * 25
@@ -303,17 +314,13 @@ class Trajectory:
             self.x = -d*math.cos(alpha/2)
             self.y = d*math.sin(alpha/2)
             self.z = -GROUND_DEPTH - 50*math.sin(math.pi/24 * orient[0]/100.0) - 150*math.sin(math.pi/24 * orient[1]/100.0)
-        
-    #def orientControl(self, orient):
-        
-            
-    def get_x(self):
+
+    def getX(self):
         return self.x
-    def get_y(self):
+    def getY(self):
         return self.y
-    def get_z(self):
+    def getZ(self):
         return self.z
-    
     
 def solveIK(targetPos, abadPos): 
     x = targetPos[0]-abadPos[0]
@@ -333,7 +340,19 @@ def solveIK(targetPos, abadPos):
         omega = sigma - math.pi/2
     return [omega, theta, phi] #abad angle, hip angle, knee angle
 
-    
+def translateTrajectory(pos, leg):
+    if leg == "FR":
+        return [pos[0]+FR_abadPos[0]+50, pos[1]+FR_abadPos[1]-STEP_LENGTH/2, pos[2]]
+    elif leg == "FL":
+        return [pos[0]+FL_abadPos[0]-50, pos[1]+FL_abadPos[1]-STEP_LENGTH/2, pos[2]]
+    elif leg == "BR":
+        return [pos[0]+BR_abadPos[0]+50, pos[1]+BR_abadPos[1]-STEP_LENGTH/2, pos[2]]
+    elif leg == "BL":
+        return [pos[0]+BL_abadPos[0]-50, pos[1]+BL_abadPos[1]-STEP_LENGTH/2, pos[2]]
+    return
+
+stepCount = 0
+
 def animate(frame):
     ax.cla()
     ax.set_xlim(-300,300)
@@ -344,22 +363,24 @@ def animate(frame):
     ax.set_zlabel('Z axis')
     
     drawBody() 
-    #gaitSpeed = speedSlider.val
+    gaitSpeed = speedSlider.val
     
-    # FR_trajectory.interpolate(gaitSpeed)
-    # FL_trajectory.interpolate(gaitSpeed)
-    # BR_trajectory.interpolate(gaitSpeed)
-    # BL_trajectory.interpolate(gaitSpeed)
-    FR_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
-    FL_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
-    BR_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
-    BL_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
+    FR_trajectory.interpolate(gaitSpeed)
+    FL_trajectory.interpolate(gaitSpeed)
+    BR_trajectory.interpolate(gaitSpeed)
+    BL_trajectory.interpolate(gaitSpeed)
+    
+    
+    # FR_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
+    # FL_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
+    # BR_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
+    # BL_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
     
     #end effector positions
-    FR_footPos = translateTrajectory([FR_trajectory.get_x(), FR_trajectory.get_y(), FR_trajectory.get_z()], "FR")
-    FL_footPos = translateTrajectory([FL_trajectory.get_x(), FL_trajectory.get_y(), FL_trajectory.get_z()], "FL")
-    BR_footPos = translateTrajectory([BR_trajectory.get_x(), BR_trajectory.get_y(), BR_trajectory.get_z()], "BR")
-    BL_footPos = translateTrajectory([BL_trajectory.get_x(), BL_trajectory.get_y(), BL_trajectory.get_z()], "BL")
+    FR_footPos = translateTrajectory([FR_trajectory.getX(), FR_trajectory.getY(), FR_trajectory.getZ()], "FR")
+    FL_footPos = translateTrajectory([FL_trajectory.getX(), FL_trajectory.getY(), FL_trajectory.getZ()], "FL")
+    BR_footPos = translateTrajectory([BR_trajectory.getX(), BR_trajectory.getY(), BR_trajectory.getZ()], "BR")
+    BL_footPos = translateTrajectory([BL_trajectory.getX(), BL_trajectory.getY(), BL_trajectory.getZ()], "BL")
     
     #draw feet as points
     ax.scatter(FR_footPos[0], FR_footPos[1], FR_footPos[2], color='black', s=100, label='Point')
@@ -409,17 +430,22 @@ def animate(frame):
     # ax.plot([0, BR_footPos[0]], [0, BR_footPos[1]], [0, BR_footPos[2]])
     # ax.plot([0, BL_footPos[0]], [0, BL_footPos[1]], [0, BL_footPos[2]])
     
+    global stepCount
+    if FR_trajectory.checkGrounded():
+        stepCount += 1
     
-def translateTrajectory(pos, leg):
-    if leg == "FR":
-        return [pos[0]+FR_abadPos[0]+50, pos[1]+FR_abadPos[1]-STEP_LENGTH/2, pos[2]]
-    elif leg == "FL":
-        return [pos[0]+FL_abadPos[0]-50, pos[1]+FL_abadPos[1]-STEP_LENGTH/2, pos[2]]
-    elif leg == "BR":
-        return [pos[0]+BR_abadPos[0]+50, pos[1]+BR_abadPos[1]-STEP_LENGTH/2, pos[2]]
-    elif leg == "BL":
-        return [pos[0]+BL_abadPos[0]-50, pos[1]+BL_abadPos[1]-STEP_LENGTH/2, pos[2]]
-    return
+    print(stepCount)
+    if stepCount == 5 and FR_trajectory.getDir() != "left_turn":
+        FR_trajectory.setDir("left_turn")
+        FL_trajectory.setDir("left_turn")
+        BR_trajectory.setDir("left_turn")
+        BL_trajectory.setDir("left_turn")
+    elif stepCount == 10 and FR_trajectory.getDir() != "right":
+        FR_trajectory.setDir("backward")
+        FL_trajectory.setDir("backward")
+        BR_trajectory.setDir("backward")
+        BL_trajectory.setDir("backward")
+    
 
 #main program below
 fig = plt.figure()
@@ -429,23 +455,25 @@ FR_trajectory = Trajectory("FR")
 FL_trajectory = Trajectory("FL")
 BR_trajectory = Trajectory("BR")
 BL_trajectory = Trajectory("BL")
-FR_trajectory.set_dir("left_turn")
-FL_trajectory.set_dir("left_turn")
-BR_trajectory.set_dir("left_turn")
-BL_trajectory.set_dir("left_turn")
+FR_trajectory.setDir("forward")
+FL_trajectory.setDir("forward")
+BR_trajectory.setDir("forward")
+BL_trajectory.setDir("forward")
 
 
 ani = animation.FuncAnimation(fig, animate, frames=200, interval=50)
-# axSlider = plt.axes([0.25, 0, 0.65, 0.03], facecolor='lightgoldenrodyellow')
-# speedSlider = Slider(axSlider, 'Gait Speed', 0, 100, valinit=GAIT_SPEED)
-rollAxSlider = plt.axes([0.25, 0.1, 0.65, 0.03], facecolor='lightgoldenrodyellow')
-pitchAxSlider = plt.axes([0.25, 0.05, 0.65, 0.03], facecolor='lightgoldenrodyellow')
-yawAxSlider = plt.axes([0.25, 0, 0.65, 0.03], facecolor='lightgoldenrodyellow')
+axSlider = plt.axes([0.25, 0, 0.65, 0.03], facecolor='lightgoldenrodyellow')
+speedSlider = Slider(axSlider, 'Gait Speed', 0, 100, valinit=GAIT_SPEED)
 
-rollSlider = Slider(rollAxSlider, 'rollPos', -100, 100, valinit=0)
-pitchSlider = Slider(pitchAxSlider, 'pitchPos', -100, 100, valinit=0)
-yawSlider = Slider(yawAxSlider, 'yawPos', -100, 100, valinit=0)
+# rollAxSlider = plt.axes([0.25, 0.1, 0.65, 0.03], facecolor='lightgoldenrodyellow')
+# pitchAxSlider = plt.axes([0.25, 0.05, 0.65, 0.03], facecolor='lightgoldenrodyellow')
+# yawAxSlider = plt.axes([0.25, 0, 0.65, 0.03], facecolor='lightgoldenrodyellow')
+
+# rollSlider = Slider(rollAxSlider, 'rollPos', -100, 100, valinit=0)
+# pitchSlider = Slider(pitchAxSlider, 'pitchPos', -100, 100, valinit=0)
+# yawSlider = Slider(yawAxSlider, 'yawPos', -100, 100, valinit=0)
 
 # Show the plot
 plt.show()
+
     
