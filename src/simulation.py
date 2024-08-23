@@ -8,11 +8,11 @@ import time
 #declare constants
 STEP_LENGTH = 50
 STEP_HEIGHT = 30
-BACK_STEP_DEPTH = 5
+BACK_STEP_DEPTH = 2
 
 SIDE_STEP_LENGTH = 20
 SIDE_STEP_HEIGHT = 20
-SIDE_BACK_STEP_DEPTH = 5
+SIDE_BACK_STEP_DEPTH = 2
 
 GAIT_SPEED = 80
 GROUND_DEPTH = 200
@@ -93,7 +93,7 @@ class Trajectory:
                 if self.x <= 0:
                     self.x = 0
                     self.phase = "swing"
-                self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
+                self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
         
         elif self.dir == "left":
             rate = SIDE_STEP_LENGTH / (self.interpolations - (speed / 100.0 * 18))
@@ -108,7 +108,7 @@ class Trajectory:
                 if self.x >= 0:
                     self.x = 0
                     self.phase = "swing"
-                self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
+                self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
         
         elif self.dir == "right_turn":
             rate = SIDE_STEP_LENGTH / (self.interpolations - (speed / 100.0 * 18))
@@ -124,7 +124,7 @@ class Trajectory:
                     if self.x <= 0:
                         self.x = 0
                         self.phase = "swing"
-                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
+                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
             elif self.leg == "FL":
                 if self.phase == "swing":
                     self.x += rate
@@ -137,7 +137,7 @@ class Trajectory:
                     if self.x <= -SIDE_STEP_LENGTH:
                         self.x = -SIDE_STEP_LENGTH
                         self.phase = "swing"
-                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
+                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
             elif self.leg == "BR":
                 if self.phase == "swing":
                     self.x -= rate
@@ -150,7 +150,7 @@ class Trajectory:
                     if self.x >= SIDE_STEP_LENGTH:
                         self.x = SIDE_STEP_LENGTH
                         self.phase = "swing"
-                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
+                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
             elif self.leg == "BL":
                 if self.phase == "swing":
                     self.x -= rate
@@ -163,7 +163,7 @@ class Trajectory:
                     if self.x >= 0:
                         self.x = 0
                         self.phase = "swing"
-                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
+                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
             
         elif self.dir == "left_turn":
             rate = SIDE_STEP_LENGTH / (self.interpolations - (speed / 100.0 * 18))
@@ -179,7 +179,7 @@ class Trajectory:
                     if self.x >= SIDE_STEP_LENGTH:
                         self.x = SIDE_STEP_LENGTH
                         self.phase = "swing"
-                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
+                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
             elif self.leg == "FL":
                 if self.phase == "swing":
                     self.x -= rate
@@ -192,7 +192,7 @@ class Trajectory:
                     if self.x >= 0:
                         self.x = 0
                         self.phase = "swing"
-                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
+                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
             elif self.leg == "BR":
                 if self.phase == "swing":
                     self.x += rate
@@ -205,7 +205,7 @@ class Trajectory:
                     if self.x <= 0:
                         self.x = 0
                         self.phase = "swing"
-                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
+                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
             elif self.leg == "BL":
                 if self.phase == "swing":
                     self.x += rate
@@ -218,7 +218,49 @@ class Trajectory:
                     if self.x <= -SIDE_STEP_LENGTH:
                         self.x = -SIDE_STEP_LENGTH
                         self.phase = "swing"
-                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
+                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
+
+    def stop(self, speed):
+        if self.x == 0:
+            if abs(self.y) > 0:
+                rate = STEP_LENGTH / 5
+                if self.phase == "swing":
+                    if self.y > 0:
+                        self.y -= rate
+                        self.z = STEP_HEIGHT * math.sin(2 * math.pi / STEP_LENGTH/2 * self.y) - GROUND_DEPTH
+                    elif self.y < 0:
+                        self.y += rate
+                        self.z = STEP_HEIGHT * math.sin(2 * math.pi / STEP_LENGTH/2 * (self.y + STEP_LENGTH/2)) - GROUND_DEPTH
+                elif self.phase == "support":
+                    if self.y > 0:
+                        self.y -= rate
+                        self.z = -BACK_STEP_DEPTH * math.sin(2 * math.pi / STEP_LENGTH/2 * self.y) - GROUND_DEPTH
+                    elif self.y < 0:
+                        self.y += rate
+                        self.z = -BACK_STEP_DEPTH * math.sin(2 * math.pi / STEP_LENGTH/2 * (self.y + STEP_LENGTH/2)) - GROUND_DEPTH
+            return False
+        elif self.y == 0:
+            if abs(self.x) > 0:
+                rate = SIDE_STEP_LENGTH / 5
+                if self.phase == "swing":
+                    if self.x > 0:
+                        self.x -= rate
+                        self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / SIDE_STEP_LENGTH/2 * self.x) - GROUND_DEPTH
+                    elif self.x < 0:
+                        self.x += rate
+                        self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / SIDE_STEP_LENGTH/2 * (self.x + SIDE_STEP_LENGTH/2)) - GROUND_DEPTH
+                elif self.phase == "support":
+                    if self.x > 0:
+                        self.x -= rate
+                        self.z = -SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / SIDE_STEP_LENGTH/2 * self.x) - GROUND_DEPTH
+                    elif self.x < 0:
+                        self.x += rate
+                        self.z = -SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / SIDE_STEP_LENGTH/2 * (self.x + SIDE_STEP_LENGTH/2)) - GROUND_DEPTH
+            return False
+        else:
+            return True
+        
+                
     
     def checkGrounded(self):
         return (self.x == 0 and self.y == 0 and self.z == -GROUND_DEPTH)
@@ -352,6 +394,7 @@ def translateTrajectory(pos, leg):
     return
 
 stepCount = 0
+stop = False
 
 def animate(frame):
     ax.cla()
@@ -365,10 +408,37 @@ def animate(frame):
     drawBody() 
     gaitSpeed = speedSlider.val
     
-    FR_trajectory.interpolate(gaitSpeed)
-    FL_trajectory.interpolate(gaitSpeed)
-    BR_trajectory.interpolate(gaitSpeed)
-    BL_trajectory.interpolate(gaitSpeed)
+    global stepCount
+    if FR_trajectory.checkGrounded():
+        stepCount += 1
+    
+    
+    
+    print(stepCount)
+    if stepCount == 5 and FR_trajectory.getDir() != "left_turn":
+        FR_trajectory.setDir("left_turn")
+        FL_trajectory.setDir("left_turn")
+        BR_trajectory.setDir("left_turn")
+        BL_trajectory.setDir("left_turn")
+    elif stepCount == 10 and FR_trajectory.getDir() != "right":
+        FR_trajectory.setDir("right")
+        FL_trajectory.setDir("right")
+        BR_trajectory.setDir("right")
+        BL_trajectory.setDir("right")
+    elif stepCount == 15 and FR_trajectory.checkGrounded():
+        global stop 
+        stop = True
+    
+    if stop:
+        FR_trajectory.stop(gaitSpeed)
+        FL_trajectory.stop(gaitSpeed)
+        BR_trajectory.stop(gaitSpeed)
+        BL_trajectory.stop(gaitSpeed)
+    else:
+        FR_trajectory.interpolate(gaitSpeed)
+        FL_trajectory.interpolate(gaitSpeed)
+        BR_trajectory.interpolate(gaitSpeed)
+        BL_trajectory.interpolate(gaitSpeed)
     
     
     # FR_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
@@ -430,21 +500,8 @@ def animate(frame):
     # ax.plot([0, BR_footPos[0]], [0, BR_footPos[1]], [0, BR_footPos[2]])
     # ax.plot([0, BL_footPos[0]], [0, BL_footPos[1]], [0, BL_footPos[2]])
     
-    global stepCount
-    if FR_trajectory.checkGrounded():
-        stepCount += 1
     
-    print(stepCount)
-    if stepCount == 5 and FR_trajectory.getDir() != "left_turn":
-        FR_trajectory.setDir("left_turn")
-        FL_trajectory.setDir("left_turn")
-        BR_trajectory.setDir("left_turn")
-        BL_trajectory.setDir("left_turn")
-    elif stepCount == 10 and FR_trajectory.getDir() != "right":
-        FR_trajectory.setDir("backward")
-        FL_trajectory.setDir("backward")
-        BR_trajectory.setDir("backward")
-        BL_trajectory.setDir("backward")
+    
     
 
 #main program below
