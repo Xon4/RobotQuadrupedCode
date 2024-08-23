@@ -47,6 +47,7 @@ class Trajectory:
             self.y = STEP_LENGTH
             self.z = 0
         self.interpolations = 20
+        self.stopParam = 0
     
     def interpolate(self, speed): 
         # speed should be between 0 and 100
@@ -219,47 +220,35 @@ class Trajectory:
                         self.x = -SIDE_STEP_LENGTH
                         self.phase = "swing"
                     self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
-
-    def stop(self, speed):
-        if self.x == 0:
-            if abs(self.y) > 0:
-                rate = STEP_LENGTH / 5
-                if self.phase == "swing":
-                    if self.y > 0:
-                        self.y -= rate
-                        self.z = STEP_HEIGHT * math.sin(2 * math.pi / STEP_LENGTH/2 * self.y) - GROUND_DEPTH
-                    elif self.y < 0:
-                        self.y += rate
-                        self.z = STEP_HEIGHT * math.sin(2 * math.pi / STEP_LENGTH/2 * (self.y + STEP_LENGTH/2)) - GROUND_DEPTH
-                elif self.phase == "support":
-                    if self.y > 0:
-                        self.y -= rate
-                        self.z = -BACK_STEP_DEPTH * math.sin(2 * math.pi / STEP_LENGTH/2 * self.y) - GROUND_DEPTH
-                    elif self.y < 0:
-                        self.y += rate
-                        self.z = -BACK_STEP_DEPTH * math.sin(2 * math.pi / STEP_LENGTH/2 * (self.y + STEP_LENGTH/2)) - GROUND_DEPTH
-            return False
-        elif self.y == 0:
-            if abs(self.x) > 0:
-                rate = SIDE_STEP_LENGTH / 5
-                if self.phase == "swing":
-                    if self.x > 0:
-                        self.x -= rate
-                        self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / SIDE_STEP_LENGTH/2 * self.x) - GROUND_DEPTH
-                    elif self.x < 0:
-                        self.x += rate
-                        self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / SIDE_STEP_LENGTH/2 * (self.x + SIDE_STEP_LENGTH/2)) - GROUND_DEPTH
-                elif self.phase == "support":
-                    if self.x > 0:
-                        self.x -= rate
-                        self.z = -SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / SIDE_STEP_LENGTH/2 * self.x) - GROUND_DEPTH
-                    elif self.x < 0:
-                        self.x += rate
-                        self.z = -SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / SIDE_STEP_LENGTH/2 * (self.x + SIDE_STEP_LENGTH/2)) - GROUND_DEPTH
-            return False
-        else:
-            return True
+        self.stopParam = 0
         
+    def stop(self):
+        if self.x == 0:
+            rate = STEP_LENGTH / 5
+            if self.phase == "support":
+                if self.y > 0:
+                    self.y -= rate
+                    self.z = -BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * self.y) - GROUND_DEPTH
+                elif self.y < 0:
+                    self.y += rate
+                    self.z = -BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * (self.y + STEP_LENGTH)) - GROUND_DEPTH
+            elif self.phase == "swing":
+                if self.stopParam < STEP_LENGTH:
+                    self.stopParam += rate
+                    self.z = STEP_HEIGHT * math.sin(2 * math.pi / (STEP_LENGTH * 2) * self.stopParam) - GROUND_DEPTH
+        elif self.y == 0:
+            rate = SIDE_STEP_LENGTH / 5
+            if self.phase == "support":
+                if self.x > 0:
+                    self.x -= rate
+                    self.z = -SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
+                elif self.x < 0:
+                    self.x += rate
+                    self.z = -SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
+            elif self.phase == "swing":
+                if self.stopParam < SIDE_STEP_LENGTH:
+                    self.stopParam += rate
+                    self.z = STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * self.stopParam) - GROUND_DEPTH
                 
     
     def checkGrounded(self):
@@ -420,20 +409,20 @@ def animate(frame):
         FL_trajectory.setDir("left_turn")
         BR_trajectory.setDir("left_turn")
         BL_trajectory.setDir("left_turn")
-    elif stepCount == 10 and FR_trajectory.getDir() != "right":
-        FR_trajectory.setDir("right")
-        FL_trajectory.setDir("right")
-        BR_trajectory.setDir("right")
-        BL_trajectory.setDir("right")
+    elif stepCount == 10 and FR_trajectory.getDir() != "forward":
+        FR_trajectory.setDir("forward")
+        FL_trajectory.setDir("forward")
+        BR_trajectory.setDir("forward")
+        BL_trajectory.setDir("forward")
     elif stepCount == 15 and FR_trajectory.checkGrounded():
         global stop 
         stop = True
     
     if stop:
-        FR_trajectory.stop(gaitSpeed)
-        FL_trajectory.stop(gaitSpeed)
-        BR_trajectory.stop(gaitSpeed)
-        BL_trajectory.stop(gaitSpeed)
+        FR_trajectory.stop()
+        FL_trajectory.stop()
+        BR_trajectory.stop()
+        BL_trajectory.stop()
     else:
         FR_trajectory.interpolate(gaitSpeed)
         FL_trajectory.interpolate(gaitSpeed)
