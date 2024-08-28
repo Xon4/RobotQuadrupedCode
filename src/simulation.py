@@ -446,6 +446,9 @@ def drawLegs():
 
 dirState = "still"
 newKey = ""
+prevKey = ""
+stopState = False
+changedKey = False
 
 def animate(frame):
     ax.cla()
@@ -462,9 +465,20 @@ def animate(frame):
     
 
     global newKey
+    global prevKey
+    global stopState
+    global dirState
+    global changedKey
+    prevKey = newKey
     newKey = keyboard.get_hotkey_name()
     
-    
+    if prevKey != newKey and prevKey != "":
+        changedKey = True
+        
+    if changedKey and FR_trajectory.checkGrounded():
+        stopState = True
+        changedKey = False
+
     if newKey == "up":
         dirState = "forward"
     elif newKey == "down":
@@ -482,10 +496,14 @@ def animate(frame):
         BR_trajectory.setDir(dirState)
         BL_trajectory.setDir(dirState)
    
-    FR_trajectory.interpolate(gaitSpeed)
-    FL_trajectory.interpolate(gaitSpeed)
-    BR_trajectory.interpolate(gaitSpeed)
-    BL_trajectory.interpolate(gaitSpeed)
+    if stopState:
+        if (FR_trajectory.stop() or BL_trajectory.stop()) and (FL_trajectory.stop() or BR_trajectory.stop()):
+            stopState = False
+    else:
+        FR_trajectory.interpolate(gaitSpeed)
+        FL_trajectory.interpolate(gaitSpeed)
+        BR_trajectory.interpolate(gaitSpeed)
+        BL_trajectory.interpolate(gaitSpeed)
     
 
     # FR_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
