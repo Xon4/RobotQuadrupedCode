@@ -443,8 +443,7 @@ def drawLegs():
     # ax.plot([0, BL_footPos[0]], [0, BL_footPos[1]], [0, BL_footPos[2]])
     
 
-stepCount = 0
-stopState = False
+
 dirState = "still"
 newKey = ""
 
@@ -461,20 +460,11 @@ def animate(frame):
     drawLegs()
     gaitSpeed = speedSlider.val
     
-    global stepCount
-    global stopState
+
     global newKey
-    
-    if FR_trajectory.checkGrounded():
-        stepCount += 1
-   
-    prevKey = newKey
     newKey = keyboard.get_hotkey_name()
     
-    global dirState
-    if newKey != "" and prevKey != "" and newKey != prevKey:
-        stopState = True
-        
+    
     if newKey == "up":
         dirState = "forward"
     elif newKey == "down":
@@ -485,32 +475,17 @@ def animate(frame):
         dirState = "left_turn"
     elif newKey == "":
         dirState = "still"
-           
     
-    if stopState and FR_trajectory.checkGrounded():
-        if FR_trajectory.stop() and FL_trajectory.stop() and BR_trajectory.stop() and BL_trajectory.stop():
-            stopState = False
-    else:
-        if FR_trajectory.getDir() != dirState:
-            FR_trajectory.setDir(dirState)
-            FL_trajectory.setDir(dirState)
-            BR_trajectory.setDir(dirState)
-            BL_trajectory.setDir(dirState)
-        FR_trajectory.interpolate(gaitSpeed)
-        FL_trajectory.interpolate(gaitSpeed)
-        BR_trajectory.interpolate(gaitSpeed)
-        BL_trajectory.interpolate(gaitSpeed)
-    
-    # if stepCount == 5 and FR_trajectory.getDir() != "left_turn":
-    #     FR_trajectory.setDir("left_turn")
-    #     FL_trajectory.setDir("left_turn")
-    #     BR_trajectory.setDir("left_turn")
-    #     BL_trajectory.setDir("left_turn")
-    # elif stepCount == 10 and FR_trajectory.getDir() != "forward":
-    #     FR_trajectory.setDir("forward")
-    #     FL_trajectory.setDir("forward")
-    #     BR_trajectory.setDir("forward")
-    #     BL_trajectory.setDir("forward")
+    if FR_trajectory.getDir() != dirState:
+        FR_trajectory.setDir(dirState)
+        FL_trajectory.setDir(dirState)
+        BR_trajectory.setDir(dirState)
+        BL_trajectory.setDir(dirState)
+   
+    FR_trajectory.interpolate(gaitSpeed)
+    FL_trajectory.interpolate(gaitSpeed)
+    BR_trajectory.interpolate(gaitSpeed)
+    BL_trajectory.interpolate(gaitSpeed)
     
 
     # FR_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
