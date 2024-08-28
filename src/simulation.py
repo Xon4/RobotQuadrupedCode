@@ -409,20 +409,18 @@ def animate(frame):
         FL_trajectory.setDir("left_turn")
         BR_trajectory.setDir("left_turn")
         BL_trajectory.setDir("left_turn")
-    elif stepCount == 10 and FR_trajectory.getDir() != "forward":
-        FR_trajectory.setDir("forward")
-        FL_trajectory.setDir("forward")
-        BR_trajectory.setDir("forward")
-        BL_trajectory.setDir("forward")
-    elif stepCount == 15 and FR_trajectory.checkGrounded():
+    elif stepCount == 10 and FR_trajectory.getDir() != "right":
+        FR_trajectory.setDir("right")
+        FL_trajectory.setDir("right")
+        BR_trajectory.setDir("right")
+        BL_trajectory.setDir("right")
+    elif stepCount == 16 and FR_trajectory.checkGrounded():
         global stop 
         stop = True
     
     if stop:
-        FR_trajectory.stop()
-        FL_trajectory.stop()
-        BR_trajectory.stop()
-        BL_trajectory.stop()
+        if FR_trajectory.stop() or FL_trajectory.stop() or BR_trajectory.stop() or BL_trajectory.stop():
+            stop = False
     else:
         FR_trajectory.interpolate(gaitSpeed)
         FL_trajectory.interpolate(gaitSpeed)
