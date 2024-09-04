@@ -447,8 +447,10 @@ def drawLegs():
 dirState = "still"
 newKey = ""
 prevKey = ""
-stopState = False
+stopInput = False
+stopMotion = False
 changedKey = False
+
 
 def animate(frame):
     ax.cla()
@@ -466,9 +468,12 @@ def animate(frame):
 
     global newKey
     global prevKey
-    global stopState
+    global stopInput
+    global stopMotion
     global dirState
     global changedKey
+   
+    
     prevKey = newKey
     newKey = keyboard.get_hotkey_name()
     
@@ -476,7 +481,7 @@ def animate(frame):
         changedKey = True
         
     if changedKey and FR_trajectory.checkGrounded():
-        stopState = True
+        stopInput = True
         changedKey = False
 
     if newKey == "up":
@@ -484,22 +489,31 @@ def animate(frame):
     elif newKey == "down":
         dirState = "backward"
     elif newKey == "right":
-        dirState = "right_turn"
+        dirState = "right"
     elif newKey == "left":
-        dirState = "left_turn"
-    elif newKey == "":
-        dirState = "still"
+        dirState = "left"
     
     if FR_trajectory.getDir() != dirState:
         FR_trajectory.setDir(dirState)
         FL_trajectory.setDir(dirState)
         BR_trajectory.setDir(dirState)
         BL_trajectory.setDir(dirState)
-   
-    if stopState:
+    
+    if stopInput and FR_trajectory.checkGrounded():
+        stopMotion = True
+        
+    if stopMotion:
         if (FR_trajectory.stop() or BL_trajectory.stop()) and (FL_trajectory.stop() or BR_trajectory.stop()):
-            stopState = False
+                dirState = "still"
+                stopInput = False
+                stopMotion = False
+        FR_trajectory.stop()
+        FL_trajectory.stop()
+        BR_trajectory.stop()
+        BL_trajectory.stop()
+        
     else:
+       
         FR_trajectory.interpolate(gaitSpeed)
         FL_trajectory.interpolate(gaitSpeed)
         BR_trajectory.interpolate(gaitSpeed)
