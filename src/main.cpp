@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <Servo.h>
 #include <Adafruit_PWMServoDriver.h>
 #include <SPI.h>
 #include "Leg.h"
@@ -61,7 +60,7 @@ void loop()
 {
   current_time = millis();
 
-  if (abs(current_time - prev_time) >= millis_delay)
+  if ((current_time - prev_time) >= millis_delay)
   {
     FR_trajectory.interpolateNext(speed);
     FL_trajectory.interpolateNext(speed);
