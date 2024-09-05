@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib.widgets import Slider
 import time
+import keyboard
 
 #declare constants
 STEP_LENGTH = 50
@@ -249,6 +250,10 @@ class Trajectory:
                 if self.stopParam < SIDE_STEP_LENGTH:
                     self.stopParam += rate
                     self.z = STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * self.stopParam) - GROUND_DEPTH
+        
+        if self.x == 0 and self.y == 0 and self.z == -GROUND_DEPTH:
+            return True
+        return False
                 
     
     def checkGrounded(self):
@@ -314,7 +319,7 @@ class Trajectory:
         elif self.dir == "still":
             self.x = 0
             self.y = 0
-            self.z = 0
+            self.z = -GROUND_DEPTH
     
     def getDir(self):
         return self.dir
@@ -382,57 +387,7 @@ def translateTrajectory(pos, leg):
         return [pos[0]+BL_abadPos[0]-50, pos[1]+BL_abadPos[1]-STEP_LENGTH/2, pos[2]]
     return
 
-stepCount = 0
-stop = False
-
-def animate(frame):
-    ax.cla()
-    ax.set_xlim(-300,300)
-    ax.set_ylim(-300,300)
-    ax.set_zlim(-300,300)
-    ax.set_xlabel('X axis')
-    ax.set_ylabel('Y axis')
-    ax.set_zlabel('Z axis')
-    
-    drawBody() 
-    gaitSpeed = speedSlider.val
-    
-    global stepCount
-    if FR_trajectory.checkGrounded():
-        stepCount += 1
-    
-    
-    
-    print(stepCount)
-    if stepCount == 5 and FR_trajectory.getDir() != "left_turn":
-        FR_trajectory.setDir("left_turn")
-        FL_trajectory.setDir("left_turn")
-        BR_trajectory.setDir("left_turn")
-        BL_trajectory.setDir("left_turn")
-    elif stepCount == 10 and FR_trajectory.getDir() != "right":
-        FR_trajectory.setDir("right")
-        FL_trajectory.setDir("right")
-        BR_trajectory.setDir("right")
-        BL_trajectory.setDir("right")
-    elif stepCount == 16 and FR_trajectory.checkGrounded():
-        global stop 
-        stop = True
-    
-    if stop:
-        if FR_trajectory.stop() or FL_trajectory.stop() or BR_trajectory.stop() or BL_trajectory.stop():
-            stop = False
-    else:
-        FR_trajectory.interpolate(gaitSpeed)
-        FL_trajectory.interpolate(gaitSpeed)
-        BR_trajectory.interpolate(gaitSpeed)
-        BL_trajectory.interpolate(gaitSpeed)
-    
-    
-    # FR_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
-    # FL_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
-    # BR_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
-    # BL_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
-    
+def drawLegs():
     #end effector positions
     FR_footPos = translateTrajectory([FR_trajectory.getX(), FR_trajectory.getY(), FR_trajectory.getZ()], "FR")
     FL_footPos = translateTrajectory([FL_trajectory.getX(), FL_trajectory.getY(), FL_trajectory.getZ()], "FL")
@@ -487,7 +442,88 @@ def animate(frame):
     # ax.plot([0, BR_footPos[0]], [0, BR_footPos[1]], [0, BR_footPos[2]])
     # ax.plot([0, BL_footPos[0]], [0, BL_footPos[1]], [0, BL_footPos[2]])
     
+
+
+dirState = "still"
+newKey = ""
+prevKey = ""
+stopInput = False
+stopMotion = False
+changedKey = False
+
+
+def animate(frame):
+    ax.cla()
+    ax.set_xlim(-300,300)
+    ax.set_ylim(-300,300)
+    ax.set_zlim(-300,300)
+    ax.set_xlabel('X axis')
+    ax.set_ylabel('Y axis')
+    ax.set_zlabel('Z axis')
     
+    drawBody() 
+    drawLegs()
+    gaitSpeed = speedSlider.val
+    
+
+    global newKey
+    global prevKey
+    global stopInput
+    global stopMotion
+    global dirState
+    global changedKey
+   
+    
+    prevKey = newKey
+    newKey = keyboard.get_hotkey_name()
+    
+    if prevKey != newKey and prevKey != "":
+        changedKey = True
+        
+    if changedKey and FR_trajectory.checkGrounded():
+        stopInput = True
+        changedKey = False
+
+    if newKey == "up":
+        dirState = "forward"
+    elif newKey == "down":
+        dirState = "backward"
+    elif newKey == "right":
+        dirState = "right"
+    elif newKey == "left":
+        dirState = "left"
+    
+    if FR_trajectory.getDir() != dirState:
+        FR_trajectory.setDir(dirState)
+        FL_trajectory.setDir(dirState)
+        BR_trajectory.setDir(dirState)
+        BL_trajectory.setDir(dirState)
+    
+    if stopInput and FR_trajectory.checkGrounded():
+        stopMotion = True
+        
+    if stopMotion:
+        if (FR_trajectory.stop() or BL_trajectory.stop()) and (FL_trajectory.stop() or BR_trajectory.stop()):
+                dirState = "still"
+                stopInput = False
+                stopMotion = False
+        FR_trajectory.stop()
+        FL_trajectory.stop()
+        BR_trajectory.stop()
+        BL_trajectory.stop()
+        
+    else:
+       
+        FR_trajectory.interpolate(gaitSpeed)
+        FL_trajectory.interpolate(gaitSpeed)
+        BR_trajectory.interpolate(gaitSpeed)
+        BL_trajectory.interpolate(gaitSpeed)
+    
+
+    # FR_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
+    # FL_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
+    # BR_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
+    # BL_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
     
     
 
@@ -499,10 +535,10 @@ FR_trajectory = Trajectory("FR")
 FL_trajectory = Trajectory("FL")
 BR_trajectory = Trajectory("BR")
 BL_trajectory = Trajectory("BL")
-FR_trajectory.setDir("forward")
-FL_trajectory.setDir("forward")
-BR_trajectory.setDir("forward")
-BL_trajectory.setDir("forward")
+FR_trajectory.setDir("still")
+FL_trajectory.setDir("still")
+BR_trajectory.setDir("still")
+BL_trajectory.setDir("still")
 
 
 ani = animation.FuncAnimation(fig, animate, frames=200, interval=50)
