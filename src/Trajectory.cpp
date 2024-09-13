@@ -10,30 +10,32 @@ Trajectory::Trajectory(float step_length_init, float step_height_init, float bac
     back_step_depth = back_step_depth_init;
     x = 0;
     y = 0;
+    z = 0;
+    interpolations = 20;
 }
 
 void Trajectory::interpolateNext(int speed) // speed can be a value from 0 to 100
 {
     if (swing)
     {
-        x += step_length / (interpolations - ((speed / 100.0) * 20)); // subtract a percent fraction of 20 dependent on the speed from the interpolations, whose default val is 20 (i.e. 40-20 interpolations)
+        y += step_length / (interpolations - ((speed / 100.0) * 10)); // subtract a percent fraction of 20 dependent on the speed from the interpolations, whose default val is 20 (i.e. 40-20 interpolations)
 
-        if (x >= step_length)
+        if (y >= step_length)
         {
-            x = step_length;
+            y = step_length;
             swing = false;
         }
-        y = step_height * sin(2 * PI / (step_length * 2) * x); // calculate y value after the conditional so if x exceeds step length, it is set to step length and the y val won't go negative
+        z = step_height * sin(2 * PI / (step_length * 2) * y); // calculate z value after the conditional so if y exceeds step length, it is set to step length and the z val won't go negative
     }
     else
     {
-        x -= step_length / (interpolations - ((speed / 100.0) * 20));
-        if (x <= 0)
+        y -= step_length / (interpolations - ((speed / 100.0) * 10));
+        if (y <= 0)
         {
-            x = 0;
+            y = 0;
             swing = true;
         }
-        y = -back_step_depth * sin(2 * PI / (step_length * 2) * x);
+        z = -back_step_depth * sin(2 * PI / (step_length * 2) * y);
     }
 }
 
@@ -45,4 +47,9 @@ float Trajectory::get_x()
 float Trajectory::get_y()
 {
     return y;
+}
+
+float Trajectory::get_z()
+{
+    return z;
 }

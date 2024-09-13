@@ -9,7 +9,8 @@ private:
   float back_step_depth;
   float x;
   float y;
-  int interpolations = 40; 
+  float z;
+  int interpolations;
   bool swing;
   int phase;
 
@@ -18,6 +19,7 @@ public:
   void interpolateNext(int speed);
   float get_x();
   float get_y();
+  float get_z();
 };
 
 #endif

@@ -8,18 +8,14 @@ private:
   float abad_angle;
   float hip_angle;
   float knee_angle;
-  int abad_servo;
-  int hip_servo;
-  int knee_servo;
-  Adafruit_PWMServoDriver pwm;
+  int type;
   const int L1 = 120;
   const int L2 = 120;
   const int L3 = 20;
 
 public:
-  Leg(Adafruit_PWMServoDriver &pwm_init, int abad_servo_init, int hip_servo_init, int knee_servo_init);
-  void updateAngles(int x, int y, int z);
-  void updateServos();
+  Leg(int type_init); // type: 1 -> FR, 2 -> FL, 3 -> BR, 4 -> BL
+  void updateAngles(float x, float y, float z);
   float get_abad_angle();
   float get_hip_angle();
   float get_knee_angle();
