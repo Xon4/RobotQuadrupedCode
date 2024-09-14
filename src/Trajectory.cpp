@@ -1,14 +1,31 @@
 #include "Trajectory.h"
 #include <Arduino.h>
 
-Trajectory::Trajectory(float step_length_init, float step_height_init, float back_step_depth_init, float side_step_length, float side_step_height, float side_back_step_depth, int leg_init)
+Trajectory::Trajectory(float step_length_init, float step_height_init, float back_step_depth_init, float side_step_length_init, float side_step_height_init, float side_back_step_depth_init, int leg_init)
 {
     leg = leg_init; // 1 -> "FR", 2 -> "FL", 3 -> "BR", 4 -> "BL"
     step_length = step_length_init;
     step_height = step_height_init;
     back_step_depth = back_step_depth_init;
+    side_step_length = side_step_length_init;
+    side_step_height = side_step_height_init;
+    side_back_step_depth = side_back_step_depth_init;
     interpolations = 40;
     dir = 'L';
+    // if (leg == 4 || leg == 1)
+    // {
+    //     x = 0;
+    //     y = 0;
+    //     z = 0;
+    //     swing = true; // legs that are phase 1 will start in swing phase whereas legs that are phase 2 will start in support phase
+    // }
+    // else if (leg == 2 || leg == 3)
+    // {
+    //     x = 0;
+    //     y = step_length;
+    //     z = 0;
+    //     swing = false;
+    // }
     if (leg == 4 || leg == 1)
     {
         x = 0;
@@ -18,8 +35,8 @@ Trajectory::Trajectory(float step_length_init, float step_height_init, float bac
     }
     else if (leg == 2 || leg == 3)
     {
-        x = 0;
-        y = step_length;
+        x = -side_step_length;
+        y = 0;
         z = 0;
         swing = false;
     }
@@ -82,23 +99,23 @@ void Trajectory::interpolateNext(int speed) // speed can be a value from 0 to 10
         float rate = side_step_length / (interpolations - ((speed / 100.0) * 10));
         if (swing)
         {
-            y += rate; // subtract a percent fraction of 40 dependent on the speed from the interpolations, whose default val is 30 (i.e. 40-10 interpolations)
-            if (y >= side_step_length)
+            x += rate; // subtract a percent fraction of 40 dependent on the speed from the interpolations, whose default val is 30 (i.e. 40-10 interpolations)
+            if (x >= side_step_length)
             {
-                y = side_step_length;
+                x = side_step_length;
                 swing = false;
             }
-            z = side_step_height * sin(2 * PI / (side_step_length * 2) * y); // calculate z value after the conditional so if y exceeds step length, it is set to step length and the z val won't go negative
+            z = side_step_height * sin(2 * PI / (side_step_length * 2) * x);
         }
         else
         {
-            y -= rate;
-            if (y <= 0)
+            x -= rate;
+            if (x <= 0)
             {
-                y = 0;
+                x = 0;
                 swing = true;
             }
-            z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * y);
+            z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * x);
         }
     }
 
@@ -107,28 +124,26 @@ void Trajectory::interpolateNext(int speed) // speed can be a value from 0 to 10
         float rate = side_step_length / (interpolations - ((speed / 100.0) * 10));
         if (swing)
         {
-            y -= rate; // subtract a percent fraction of 40 dependent on the speed from the interpolations, whose default val is 30 (i.e. 40-10 interpolations)
-            if (y <= -side_step_length)
+            x -= rate; // subtract a percent fraction of 40 dependent on the speed from the interpolations, whose default val is 30 (i.e. 40-10 interpolations)
+            if (x <= -side_step_length)
             {
-                y = -side_step_length;
+                x = -side_step_length;
                 swing = false;
             }
-            z = side_step_height * sin(2 * PI / (side_step_length * 2) * (y + side_step_length)); // calculate z value after the conditional so if y exceeds step length, it is set to step length and the z val won't go negative
+            z = side_step_height * sin(2 * PI / (side_step_length * 2) * (x + side_step_length));
         }
         else
         {
-            y += rate;
-            if (y >= 0)
+            x += rate;
+            if (x >= 0)
             {
-                y = 0;
+                x = 0;
                 swing = true;
             }
-            z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * (y + side_step_length));
+            z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * (x + side_step_length));
         }
     }
 }
-
-
 
 float Trajectory::get_x()
 {

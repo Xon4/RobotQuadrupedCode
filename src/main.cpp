@@ -24,12 +24,16 @@ unsigned long prev_time = 0;
 int millis_delay = 10;
 
 // mechanical constants
+const float L1 = 120;
+const float L2 = 120;
+const float L3 = 37.8;
+
 const float STEP_LENGTH = 50;
 const float STEP_HEIGHT = 50;
 const float BACK_STEP_DEPTH = 10;
-const float SIDE_STEP_LENGTH = 10;
-const float SIDE_STEP_HEIGHT = 20;
-const float SIDE_BACK_STEP_DEPTH = 5;
+const float SIDE_STEP_LENGTH = 37.8;
+const float SIDE_STEP_HEIGHT = 50;
+const float SIDE_BACK_STEP_DEPTH = 10;
 const float GROUND_DEPTH = 180;
 // declare class instances
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
@@ -62,19 +66,15 @@ void loop()
     BL_trajectory.interpolateNext(speed);
     FL_trajectory.interpolateNext(speed);
 
-    BL_leg.updateAngles(5, 0, -GROUND_DEPTH);
-    FL_leg.updateAngles(5, 0, -GROUND_DEPTH);
+    BL_leg.updateAngles(BL_trajectory.get_x() + L3, BL_trajectory.get_y(), BL_trajectory.get_z() - GROUND_DEPTH);
+    FL_leg.updateAngles(FL_trajectory.get_x() + L3, FL_trajectory.get_y(), FL_trajectory.get_z() - GROUND_DEPTH);
 
-    // Serial.print(FL_trajectory.get_y());
-    // Serial.print(", ");
-    // Serial.println(FL_trajectory.get_z() - GROUND_DEPTH);
-
-    pwm.writeMicroseconds(BL_abad, map(90 - (45), 0, 180, 800, 2200));
-    pwm.writeMicroseconds(BL_hip, map(90 - (90), 0, 180, 800, 2200));
+    pwm.writeMicroseconds(BL_abad, map(BL_leg.get_abad_angle(), 0, 180, 800, 2200));
+    pwm.writeMicroseconds(BL_hip, map(BL_leg.get_hip_angle(), 0, 180, 800, 2200));
     pwm.writeMicroseconds(BL_knee, map(BL_leg.get_knee_angle(), 0, 180, 800, 2200));
 
-    pwm.writeMicroseconds(FL_abad, map(90 + (45), 0, 180, 800, 2200));
-    pwm.writeMicroseconds(FL_hip, map(90 - (90), 0, 180, 800, 2200));
+    pwm.writeMicroseconds(FL_abad, map(FL_leg.get_abad_angle(), 0, 180, 800, 2200));
+    pwm.writeMicroseconds(FL_hip, map(FL_leg.get_hip_angle(), 0, 180, 800, 2200));
     pwm.writeMicroseconds(FL_knee, map(FL_leg.get_knee_angle(), 0, 180, 800, 2200));
 
     prev_time = current_time;

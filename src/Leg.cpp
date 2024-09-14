@@ -30,30 +30,44 @@ void Leg::updateAngles(float x, float y, float z)
     theta *= 180.0 / PI;
     phi *= 180.0 / PI;
 
-    if (type == 4 || type == 3)
+    // check bounds and make sure angles are in range
+    if (hip_angle > 90)
     {
-        abad_angle = omega;
-        hip_angle = 90 - theta;
-        knee_angle = phi;
-
-        if (hip_angle > 90)
-        {
-            hip_angle = 90;
-        }
-        else if (hip_angle < 0)
-        {
-            hip_angle = 0;
-        }
-        else if (knee_angle > 90)
-        {
-            knee_angle = 90;
-        }
-        else if (knee_angle < 0)
-        {
-            knee_angle = 0;
-        }
+        hip_angle = 90;
+    }
+    else if (hip_angle < 0)
+    {
+        hip_angle = 0;
+    }
+    else if (knee_angle > 90)
+    {
+        knee_angle = 90;
+    }
+    else if (knee_angle < 0)
+    {
+        knee_angle = 0;
+    }
+    else if (abad_angle > 15)
+    {
+        abad_angle = 15;
+    }
+    else if (abad_angle < -15)
+    {
+        abad_angle = -15;
     }
 
+    if (type == 4) // transform the absolute coordinates to servo coordinates
+    {
+        abad_angle = 90 - omega;
+        hip_angle = 90 - theta;
+        knee_angle = phi;
+    }
+    else if (type == 3)
+    {
+        abad_angle = 90 + omega;
+        hip_angle = 90 - theta;
+        knee_angle = phi;
+    }
 }
 
 float Leg::get_abad_angle()

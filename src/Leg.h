@@ -11,7 +11,7 @@ private:
   int type;
   const int L1 = 120;
   const int L2 = 120;
-  const int L3 = 20;
+  const int L3 = 38.7;
 
 public:
   Leg(int type_init); // type: 1 -> FR, 2 -> FL, 3 -> BR, 4 -> BL

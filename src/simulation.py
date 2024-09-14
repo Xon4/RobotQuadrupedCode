@@ -500,9 +500,9 @@ def animate(frame):
     elif newKey == "down":
         dirState = "backward"
     elif newKey == "right":
-        dirState = "right"
+        dirState = "right_turn"
     elif newKey == "left":
-        dirState = "left"
+        dirState = "left_turn"
     
     if FR_trajectory.getDir() != dirState:
         FR_trajectory.setDir(dirState)
