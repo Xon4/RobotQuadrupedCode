@@ -3,11 +3,12 @@
 
 Trajectory::Trajectory(float step_length_init, float step_height_init, float back_step_depth_init, int leg_init)
 {
-    leg = leg_init; //1 -> "FR", 2 -> "FL", 3 -> "BR", 4 -> "BL"
+    leg = leg_init; // 1 -> "FR", 2 -> "FL", 3 -> "BR", 4 -> "BL"
     step_length = step_length_init;
     step_height = step_height_init;
     back_step_depth = back_step_depth_init;
     interpolations = 40;
+    dir = "forward";
     if (leg == 4 || leg == 1)
     {
         x = 0;
@@ -22,31 +23,33 @@ Trajectory::Trajectory(float step_length_init, float step_height_init, float bac
         z = 0;
         swing = false;
     }
-    
 }
 
 void Trajectory::interpolateNext(int speed) // speed can be a value from 0 to 100
 {
-    if (swing)
+    if (dir == "forward")
     {
-        y += step_length / (interpolations - ((speed / 100.0) * 10)); // subtract a percent fraction of 40 dependent on the speed from the interpolations, whose default val is 30 (i.e. 40-10 interpolations)
+        if (swing)
+        {
+            y += step_length / (interpolations - ((speed / 100.0) * 10)); // subtract a percent fraction of 40 dependent on the speed from the interpolations, whose default val is 30 (i.e. 40-10 interpolations)
 
-        if (y >= step_length)
-        {
-            y = step_length;
-            swing = false;
+            if (y >= step_length)
+            {
+                y = step_length;
+                swing = false;
+            }
+            z = step_height * sin(2 * PI / (step_length * 2) * y); // calculate z value after the conditional so if y exceeds step length, it is set to step length and the z val won't go negative
         }
-        z = step_height * sin(2 * PI / (step_length * 2) * y); // calculate z value after the conditional so if y exceeds step length, it is set to step length and the z val won't go negative
-    }
-    else
-    {
-        y -= step_length / (interpolations - ((speed / 100.0) * 10));
-        if (y <= 0)
+        else
         {
-            y = 0;
-            swing = true;
+            y -= step_length / (interpolations - ((speed / 100.0) * 10));
+            if (y <= 0)
+            {
+                y = 0;
+                swing = true;
+            }
+            z = -back_step_depth * sin(2 * PI / (step_length * 2) * y);
         }
-        z = -back_step_depth * sin(2 * PI / (step_length * 2) * y);
     }
 }
 
