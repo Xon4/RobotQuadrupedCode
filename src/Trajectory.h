@@ -12,10 +12,10 @@ private:
   float z;
   int interpolations;
   bool swing;
-  int phase;
+  int leg;
 
 public:
-  Trajectory(float step_length_init, float step_height_init, float back_step_depth_init, int phase_init);
+  Trajectory(float step_length_init, float step_height_init, float back_step_depth_init, int leg_init);
   void interpolateNext(int speed);
   float get_x();
   float get_y();

@@ -30,7 +30,7 @@ void Leg::updateAngles(float x, float y, float z)
     theta *= 180.0 / PI;
     phi *= 180.0 / PI;
 
-    if (type == 4)
+    if (type == 4 || type == 3)
     {
         abad_angle = omega;
         hip_angle = 90 - theta;
@@ -53,6 +53,7 @@ void Leg::updateAngles(float x, float y, float z)
             knee_angle = 0;
         }
     }
+
 }
 
 float Leg::get_abad_angle()

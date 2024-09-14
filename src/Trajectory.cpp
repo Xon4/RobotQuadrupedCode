@@ -1,24 +1,35 @@
 #include "Trajectory.h"
 #include <Arduino.h>
 
-Trajectory::Trajectory(float step_length_init, float step_height_init, float back_step_depth_init, int phase_init)
+Trajectory::Trajectory(float step_length_init, float step_height_init, float back_step_depth_init, int leg_init)
 {
-    phase = phase_init;
-    (phase == 1) ? swing = true : swing = false; // legs that are phase 1 will start in swing phase whereas legs that are phase 2 will start in support phase
+    leg = leg_init; //1 -> "FR", 2 -> "FL", 3 -> "BR", 4 -> "BL"
     step_length = step_length_init;
     step_height = step_height_init;
     back_step_depth = back_step_depth_init;
-    x = 0;
-    y = 0;
-    z = 0;
-    interpolations = 20;
+    interpolations = 40;
+    if (leg == 4 || leg == 1)
+    {
+        x = 0;
+        y = 0;
+        z = 0;
+        swing = true; // legs that are phase 1 will start in swing phase whereas legs that are phase 2 will start in support phase
+    }
+    else if (leg == 2 || leg == 3)
+    {
+        x = 0;
+        y = step_length;
+        z = 0;
+        swing = false;
+    }
+    
 }
 
 void Trajectory::interpolateNext(int speed) // speed can be a value from 0 to 100
 {
     if (swing)
     {
-        y += step_length / (interpolations - ((speed / 100.0) * 10)); // subtract a percent fraction of 20 dependent on the speed from the interpolations, whose default val is 20 (i.e. 40-20 interpolations)
+        y += step_length / (interpolations - ((speed / 100.0) * 10)); // subtract a percent fraction of 40 dependent on the speed from the interpolations, whose default val is 30 (i.e. 40-10 interpolations)
 
         if (y >= step_length)
         {
