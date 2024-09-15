@@ -76,7 +76,7 @@ void loop()
     pwm.writeMicroseconds(FL_abad, map(FL_leg.get_abad_angle(), 0, 180, 800, 2200));
     pwm.writeMicroseconds(FL_hip, map(FL_leg.get_hip_angle(), 0, 180, 800, 2200));
     pwm.writeMicroseconds(FL_knee, map(FL_leg.get_knee_angle(), 0, 180, 800, 2200));
-
+    
     prev_time = current_time;
   }
 }
