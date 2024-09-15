@@ -37,13 +37,13 @@ const float SIDE_BACK_STEP_DEPTH = 10;
 const float GROUND_DEPTH = 180;
 
 // controller input variables
-char new_input_dir;
-char prev_input_dir;
-char dir_state;
-float joystick_magnitude;
-bool stop_input;
-bool stop_motion;
-bool changed_key;
+char new_input_dir = 'S';
+char prev_input_dir = 'S';
+char dir_state = 'S';
+float joystick_magnitude = 0;
+bool stop_input = false;
+bool stop_motion = false;
+bool changed_key = false;
 
 // declare class instances
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
@@ -64,6 +64,17 @@ void setup()
   pwm.setPWMFreq(SERVO_FREQ);
   Serial.begin(9600);
 
+  BL_leg.updateAngles(L3, 0, -GROUND_DEPTH);
+  FL_leg.updateAngles(L3, 0, -GROUND_DEPTH);
+
+  pwm.writeMicroseconds(BL_abad, map(BL_leg.get_abad_angle(), 0, 180, 800, 2200));
+  pwm.writeMicroseconds(BL_hip, map(BL_leg.get_hip_angle(), 0, 180, 800, 2200));
+  pwm.writeMicroseconds(BL_knee, map(BL_leg.get_knee_angle(), 0, 180, 800, 2200));
+
+  pwm.writeMicroseconds(FL_abad, map(FL_leg.get_abad_angle(), 0, 180, 800, 2200));
+  pwm.writeMicroseconds(FL_hip, map(FL_leg.get_hip_angle(), 0, 180, 800, 2200));
+  pwm.writeMicroseconds(FL_knee, map(FL_leg.get_knee_angle(), 0, 180, 800, 2200));
+
   ps5.begin("7c:66:ef:25:7b:a5"); // replace with MAC address of your controller
 }
 
@@ -72,39 +83,39 @@ void loop()
   current_time = millis();
   while (ps5.isConnected() == false)
   {
-    // insert code to indicate connecting
+    Serial.println("not connected");
   }
 
   while (ps5.isConnected() == true)
   {
     prev_input_dir = new_input_dir;
 
-    if (ps5.RStickX() > 10)
+    if (ps5.RStickX() > 30)
     {
       joystick_magnitude = abs(ps5.RStickX());
       new_input_dir = 'r';
     }
-    else if (ps5.RStickX() < -10)
+    else if (ps5.RStickX() < -30)
     {
       joystick_magnitude = abs(ps5.RStickX());
       new_input_dir = 'l';
     }
-    else if (ps5.LStickX() > 10)
+    else if (ps5.LStickX() > 30)
     {
       joystick_magnitude = abs(ps5.LStickX());
       new_input_dir = 'R';
     }
-    else if (ps5.LStickX() < -10)
+    else if (ps5.LStickX() < -30)
     {
       joystick_magnitude = abs(ps5.LStickX());
       new_input_dir = 'L';
     }
-    else if (ps5.LStickY() > 10)
+    else if (ps5.LStickY() > 30)
     {
       joystick_magnitude = abs(ps5.LStickY());
       new_input_dir = 'F';
     }
-    else if (ps5.LStickY() < -10)
+    else if (ps5.LStickY() < -30)
     {
       joystick_magnitude = abs(ps5.LStickY());
       new_input_dir = 'B';
@@ -114,6 +125,9 @@ void loop()
       joystick_magnitude = 0;
       new_input_dir = 'S';
     }
+    Serial.print(FL_trajectory.getDir());
+    Serial.print(", ");
+    Serial.println(BL_trajectory.getDir());
 
     if (prev_input_dir != new_input_dir && prev_input_dir != 'S')
     {
@@ -142,27 +156,24 @@ void loop()
       stop_motion = true;
     }
 
-    if (stop_motion)
-    {
-      if (BL_trajectory.stop() && FL_trajectory.stop())
-      {
-        dir_state = 'S';
-        stop_input = false;
-        stop_motion = false;
-      }
-      BL_trajectory.stop();
-      FL_trajectory.stop();
-    }
-    else
-    {
-      BL_trajectory.interpolateNext(map(joystick_magnitude, 0, 128, 0, 100));
-      FL_trajectory.interpolateNext(map(joystick_magnitude, 0, 128, 0, 100));
-    }
-
     if (fabs(current_time - prev_time) >= 10)
     {
-      BL_trajectory.interpolateNext(speed);
-      FL_trajectory.interpolateNext(speed);
+      if (stop_motion)
+      {
+        if (BL_trajectory.stop() && FL_trajectory.stop())
+        {
+          dir_state = 'S';
+          stop_input = false;
+          stop_motion = false;
+        }
+        BL_trajectory.stop();
+        FL_trajectory.stop();
+      }
+      else
+      {
+        BL_trajectory.interpolateNext(map(joystick_magnitude, 30, 127, 0, 100));
+        FL_trajectory.interpolateNext(map(joystick_magnitude, 30, 127, 0, 100));
+      }
 
       BL_leg.updateAngles(BL_trajectory.get_x() + L3, BL_trajectory.get_y(), BL_trajectory.get_z() - GROUND_DEPTH);
       FL_leg.updateAngles(FL_trajectory.get_x() + L3, FL_trajectory.get_y(), FL_trajectory.get_z() - GROUND_DEPTH);
