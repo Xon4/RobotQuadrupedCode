@@ -25,6 +25,7 @@ public:
   bool stop();
   bool checkGrounded();
   void setDir(char dir_val);
+  char getDir();
   float get_x();
   float get_y();
   float get_z();

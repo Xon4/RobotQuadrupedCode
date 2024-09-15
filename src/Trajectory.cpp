@@ -414,12 +414,16 @@ void Trajectory::setDir(char dir_val)
             z = 0;
         }
     }
-    else if (dir == 's')
+    else if (dir == 'S')
     {
         x = 0;
         y = 0;
         z = 0;
     }
+}
+
+char Trajectory::getDir() {
+    return dir;
 }
 
 float Trajectory::get_x()

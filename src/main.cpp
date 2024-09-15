@@ -35,6 +35,16 @@ const float SIDE_STEP_LENGTH = 37.8;
 const float SIDE_STEP_HEIGHT = 50;
 const float SIDE_BACK_STEP_DEPTH = 10;
 const float GROUND_DEPTH = 180;
+
+// controller input variables
+char new_input_dir;
+char prev_input_dir;
+char dir_state;
+float joystick_magnitude;
+bool stop_input;
+bool stop_motion;
+bool changed_key;
+
 // declare class instances
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 const int SERVO_FREQ = 50;
@@ -60,23 +70,112 @@ void setup()
 void loop()
 {
   current_time = millis();
-
-  if (fabs(current_time - prev_time) >= 10)
+  while (ps5.isConnected() == false)
   {
-    BL_trajectory.interpolateNext(speed);
-    FL_trajectory.interpolateNext(speed);
+    // insert code to indicate connecting
+  }
 
-    BL_leg.updateAngles(BL_trajectory.get_x() + L3, BL_trajectory.get_y(), BL_trajectory.get_z() - GROUND_DEPTH);
-    FL_leg.updateAngles(FL_trajectory.get_x() + L3, FL_trajectory.get_y(), FL_trajectory.get_z() - GROUND_DEPTH);
+  while (ps5.isConnected() == true)
+  {
+    prev_input_dir = new_input_dir;
 
-    pwm.writeMicroseconds(BL_abad, map(BL_leg.get_abad_angle(), 0, 180, 800, 2200));
-    pwm.writeMicroseconds(BL_hip, map(BL_leg.get_hip_angle(), 0, 180, 800, 2200));
-    pwm.writeMicroseconds(BL_knee, map(BL_leg.get_knee_angle(), 0, 180, 800, 2200));
+    if (ps5.RStickX() > 10)
+    {
+      joystick_magnitude = abs(ps5.RStickX());
+      new_input_dir = 'r';
+    }
+    else if (ps5.RStickX() < -10)
+    {
+      joystick_magnitude = abs(ps5.RStickX());
+      new_input_dir = 'l';
+    }
+    else if (ps5.LStickX() > 10)
+    {
+      joystick_magnitude = abs(ps5.LStickX());
+      new_input_dir = 'R';
+    }
+    else if (ps5.LStickX() < -10)
+    {
+      joystick_magnitude = abs(ps5.LStickX());
+      new_input_dir = 'L';
+    }
+    else if (ps5.LStickY() > 10)
+    {
+      joystick_magnitude = abs(ps5.LStickY());
+      new_input_dir = 'F';
+    }
+    else if (ps5.LStickY() < -10)
+    {
+      joystick_magnitude = abs(ps5.LStickY());
+      new_input_dir = 'B';
+    }
+    else
+    {
+      joystick_magnitude = 0;
+      new_input_dir = 'S';
+    }
 
-    pwm.writeMicroseconds(FL_abad, map(FL_leg.get_abad_angle(), 0, 180, 800, 2200));
-    pwm.writeMicroseconds(FL_hip, map(FL_leg.get_hip_angle(), 0, 180, 800, 2200));
-    pwm.writeMicroseconds(FL_knee, map(FL_leg.get_knee_angle(), 0, 180, 800, 2200));
-    
-    prev_time = current_time;
+    if (prev_input_dir != new_input_dir && prev_input_dir != 'S')
+    {
+      changed_key = true;
+    }
+
+    if (changed_key && BL_trajectory.checkGrounded())
+    {
+      stop_input = true;
+      changed_key = false;
+    }
+
+    if (new_input_dir == 'F' || new_input_dir == 'B' || new_input_dir == 'L' || new_input_dir == 'R' || new_input_dir == 'r' || new_input_dir == 'l')
+    {
+      dir_state = new_input_dir;
+    }
+
+    if (BL_trajectory.getDir() != dir_state)
+    {
+      BL_trajectory.setDir(dir_state);
+      FL_trajectory.setDir(dir_state);
+    }
+
+    if (stop_input && BL_trajectory.checkGrounded())
+    {
+      stop_motion = true;
+    }
+
+    if (stop_motion)
+    {
+      if (BL_trajectory.stop() && FL_trajectory.stop())
+      {
+        dir_state = 'S';
+        stop_input = false;
+        stop_motion = false;
+      }
+      BL_trajectory.stop();
+      FL_trajectory.stop();
+    }
+    else
+    {
+      BL_trajectory.interpolateNext(map(joystick_magnitude, 0, 128, 0, 100));
+      FL_trajectory.interpolateNext(map(joystick_magnitude, 0, 128, 0, 100));
+    }
+
+    if (fabs(current_time - prev_time) >= 10)
+    {
+      BL_trajectory.interpolateNext(speed);
+      FL_trajectory.interpolateNext(speed);
+
+      BL_leg.updateAngles(BL_trajectory.get_x() + L3, BL_trajectory.get_y(), BL_trajectory.get_z() - GROUND_DEPTH);
+      FL_leg.updateAngles(FL_trajectory.get_x() + L3, FL_trajectory.get_y(), FL_trajectory.get_z() - GROUND_DEPTH);
+
+      pwm.writeMicroseconds(BL_abad, map(BL_leg.get_abad_angle(), 0, 180, 800, 2200));
+      pwm.writeMicroseconds(BL_hip, map(BL_leg.get_hip_angle(), 0, 180, 800, 2200));
+      pwm.writeMicroseconds(BL_knee, map(BL_leg.get_knee_angle(), 0, 180, 800, 2200));
+
+      pwm.writeMicroseconds(FL_abad, map(FL_leg.get_abad_angle(), 0, 180, 800, 2200));
+      pwm.writeMicroseconds(FL_hip, map(FL_leg.get_hip_angle(), 0, 180, 800, 2200));
+      pwm.writeMicroseconds(FL_knee, map(FL_leg.get_knee_angle(), 0, 180, 800, 2200));
+
+      prev_time = current_time;
+    }
   }
 }
