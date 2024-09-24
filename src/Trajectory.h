@@ -14,6 +14,7 @@ private:
   float y;
   float z;
   int interpolations;
+  int speed_factor;
   bool swing;
   int leg;
   char dir;

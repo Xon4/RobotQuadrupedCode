@@ -11,6 +11,7 @@ Trajectory::Trajectory(float step_length_init, float step_height_init, float bac
     side_step_height = side_step_height_init;
     side_back_step_depth = side_back_step_depth_init;
     interpolations = 40;
+    speed_factor = 20;
     stop_param = 0;
     dir = 'F';
     if (leg == 4 || leg == 1)
@@ -47,7 +48,7 @@ void Trajectory::interpolateNext(int speed) // speed can be a value from 0 to 10
 {
     if (dir == 'F')
     {
-        float rate = step_length / (interpolations - ((speed / 100.0) * 10));
+        float rate = step_length / (interpolations - ((speed / 100.0) * speed_factor));
         if (swing)
         {
             y += rate;
@@ -72,32 +73,32 @@ void Trajectory::interpolateNext(int speed) // speed can be a value from 0 to 10
 
     if (dir == 'B')
     {
-        float rate = step_length / (interpolations - ((speed / 100.0) * 10));
+        float rate = step_length / (interpolations - ((speed / 100.0) * speed_factor));
         if (swing)
         {
             y -= rate;
-            if (y <= 0)
+            if (y <= -step_length)
             {
-                y = 0;
+                y = -step_length;
                 swing = false;
             }
-            z = step_height * sin(2 * PI / (step_length * 2) * y); // calculate z value after the conditional so if y exceeds step length, it is set to step length and the z val won't go negative
+            z = step_height * sin(2 * PI / (step_length * 2) * (y + step_length)); // calculate z value after the conditional so if y exceeds step length, it is set to step length and the z val won't go negative
         }
         else
         {
             y += rate;
-            if (y >= step_length)
+            if (y >= 0)
             {
-                y = step_length;
+                y = 0;
                 swing = true;
             }
-            z = -back_step_depth * sin(2 * PI / (step_length * 2) * y);
+            z = -back_step_depth * sin(2 * PI / (step_length * 2) * (y + step_length));
         }
     }
 
     if (dir == 'R')
     {
-        float rate = side_step_length / (interpolations - ((speed / 100.0) * 10));
+        float rate = side_step_length / (interpolations - ((speed / 100.0) * speed_factor));
         if (swing)
         {
             x += rate;
@@ -122,7 +123,7 @@ void Trajectory::interpolateNext(int speed) // speed can be a value from 0 to 10
 
     if (dir == 'L')
     {
-        float rate = side_step_length / (interpolations - ((speed / 100.0) * 10));
+        float rate = side_step_length / (interpolations - ((speed / 100.0) * speed_factor));
         if (swing)
         {
             x -= rate;
@@ -147,7 +148,7 @@ void Trajectory::interpolateNext(int speed) // speed can be a value from 0 to 10
 
     if (dir == 'l')
     {
-        float rate = side_step_length / (interpolations - ((speed / 100.0) * 10));
+        float rate = side_step_length / (interpolations - ((speed / 100.0) * speed_factor));
         if (leg == 1)
         {
             if (swing)
@@ -235,6 +236,102 @@ void Trajectory::interpolateNext(int speed) // speed can be a value from 0 to 10
                 if (x <= -side_step_length)
                 {
                     x = -side_step_length;
+                    swing = true;
+                }
+                z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * (x + side_step_length));
+            }
+        }
+    }
+    if (dir == 'r')
+    {
+        float rate = side_step_length / (interpolations - ((speed / 100.0) * speed_factor));
+        if (leg == 1)
+        {
+            if (swing)
+            {
+                x += rate;
+                if (x >= side_step_length)
+                {
+                    x = side_step_length;
+                    swing = false;
+                }
+                z = side_step_height * sin(2 * PI / (side_step_length * 2) * x);
+            }
+            else
+            {
+                x -= rate;
+                if (x <= 0)
+                {
+                    x = 0;
+                    swing = true;
+                }
+                z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * x);
+            }
+        }
+        else if (leg == 2)
+        {
+            if (swing)
+            {
+                x += rate;
+                if (x >= 0)
+                {
+                    x = 0;
+                    swing = false;
+                }
+                z = side_step_height * sin(2 * PI / (side_step_length * 2) * (x + side_step_length));
+            }
+            else
+            {
+                x -= rate;
+                if (x <= -side_step_length)
+                {
+                    x = -side_step_length;
+                    swing = true;
+                }
+                z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * (x + side_step_length));
+            }
+        }
+        else if (leg == 3)
+        {
+            if (swing)
+            {
+                x -= rate;
+                if (x <= 0)
+                {
+                    x = 0;
+                    swing = false;
+                }
+                z = side_step_height * sin(2 * PI / (side_step_length * 2) * x);
+            }
+            else
+            {
+                x += rate;
+                if (x >= side_step_length)
+                {
+                    x = side_step_length;
+                    swing = true;
+                }
+                z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * x);
+            }
+        }
+        else if (leg == 4)
+        {
+            if (swing)
+            {
+                x -= rate;
+                if (x <= -side_step_length)
+                {
+                    x = -side_step_length;
+                    swing = false;
+                }
+                z = side_step_height * sin(2 * PI / (side_step_length * 2) * (x + side_step_length));
+            }
+            else
+            {
+                x += rate;
+                if (x >= 0)
+                {
+                    x = 0;
                     swing = true;
                 }
                 z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * (x + side_step_length));
@@ -422,7 +519,8 @@ void Trajectory::setDir(char dir_val)
     }
 }
 
-char Trajectory::getDir() {
+char Trajectory::getDir()
+{
     return dir;
 }
 

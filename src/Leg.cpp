@@ -8,6 +8,10 @@ Leg::Leg(int type_init)
 
 void Leg::updateAngles(float x, float y, float z)
 {
+    if (type == 1 || type == 3)
+    {
+        x = -x;
+    }
     float l = sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2));
     float d = sqrt(pow(l, 2) - pow(L3, 2));
     float alpha = acos((pow(L1, 2) + pow(d, 2) - pow(L2, 2)) / (2 * L1 * d));
@@ -56,15 +60,28 @@ void Leg::updateAngles(float x, float y, float z)
         abad_angle = -15;
     }
 
-    if (type == 4) // transform the absolute coordinates to servo coordinates
+    // transform the absolute coordinates to servo coordinates
+    if (type == 1) // FR
     {
         abad_angle = 90 - omega;
+        hip_angle = 90 + theta;
+        knee_angle = 180 - phi;
+    }
+    else if (type == 2) // FL
+    {
+        abad_angle = 90 + omega;
         hip_angle = 90 - theta;
         knee_angle = phi;
     }
-    else if (type == 3)
+    else if (type == 3) // BR
     {
         abad_angle = 90 + omega;
+        hip_angle = 90 + theta;
+        knee_angle = 180 - phi;
+    }
+    else if (type == 4) // BL
+    {
+        abad_angle = 90 - omega;
         hip_angle = 90 - theta;
         knee_angle = phi;
     }
