@@ -12,7 +12,6 @@ Trajectory::Trajectory(float step_length_init, float step_height_init, float bac
     side_back_step_depth = side_back_step_depth_init;
     interpolations = 40;
     speed_factor = 20;
-    stop_param = 0;
     dir = 'F';
     if (leg == 4 || leg == 1)
     {
@@ -337,68 +336,7 @@ void Trajectory::interpolateNext(int speed) // speed can be a value from 0 to 10
                 z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * (x + side_step_length));
             }
         }
-        stop_param = 0;
     }
-}
-
-bool Trajectory::stop()
-{
-    if (x == 0)
-    {
-        float rate = step_length / 5;
-        if (!swing)
-        {
-            if (y > 0)
-            {
-                y -= rate;
-                z = -back_step_depth * sin(2 * PI / (step_length * 2) * y);
-            }
-            else if (y < 0)
-            {
-                y += rate;
-                z = -back_step_depth * sin(2 * PI / (step_length * 2) * (y + step_length));
-            }
-        }
-        else
-        {
-            if (stop_param < step_length)
-            {
-                stop_param += rate;
-                z = step_height * sin(2 * PI / (step_length * 2) * stop_param);
-            }
-        }
-    }
-    else if (y == 0)
-    {
-        float rate = side_step_length / 5;
-        if (!swing)
-        {
-            if (x > 0)
-            {
-                x -= rate;
-                z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * x);
-            }
-            else if (x < 0)
-            {
-                x += rate;
-                z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * (x + side_step_length));
-            }
-        }
-        else
-        {
-            if (stop_param < side_step_length)
-            {
-                stop_param += rate;
-                z = step_height * sin(2 * PI / (side_step_length * 2) * stop_param);
-            }
-        }
-    }
-
-    if (x == 0 && y == 0 && z == 0)
-    {
-        return true;
-    }
-    return false;
 }
 
 bool Trajectory::checkGrounded()
