@@ -51,22 +51,22 @@ void Trajectory::interpolateNext(int speed) // speed can be a value from 0 to 10
         if (swing)
         {
             y += rate;
-            if (y >= step_length)
+            if (y >= 1.0 / 2 * step_length)
             {
-                y = step_length;
+                y = 1.0 / 2 * step_length;
                 swing = false;
             }
-            z = step_height * sin(2 * PI / (step_length * 2) * y); // calculate z value after the conditional so if y exceeds step length, it is set to step length and the z val won't go negative
+            z = step_height * sin(2 * PI / (step_length * 2) * (y + 1.0 / 2 * step_length)); // calculate z value after the conditional so if y exceeds step length, it is set to step length and the z val won't go negative
         }
         else
         {
             y -= rate;
-            if (y <= 0)
+            if (y <= -1.0 / 2 * step_length)
             {
-                y = 0;
+                y = -1.0 / 2 * step_length;
                 swing = true;
             }
-            z = -back_step_depth * sin(2 * PI / (step_length * 2) * y);
+            z = -back_step_depth * sin(2 * PI / (step_length * 2) * (y + 1.0 / 2 * step_length));
         }
     }
 
@@ -76,22 +76,22 @@ void Trajectory::interpolateNext(int speed) // speed can be a value from 0 to 10
         if (swing)
         {
             y -= rate;
-            if (y <= -step_length)
+            if (y <= -1.0 / 2 * step_length)
             {
-                y = -step_length;
+                y = -1.0 / 2 * step_length;
                 swing = false;
             }
-            z = step_height * sin(2 * PI / (step_length * 2) * (y + step_length)); // calculate z value after the conditional so if y exceeds step length, it is set to step length and the z val won't go negative
+            z = step_height * sin(2 * PI / (step_length * 2) * (y + 1.0 / 2 * step_length)); // calculate z value after the conditional so if y exceeds step length, it is set to step length and the z val won't go negative
         }
         else
         {
             y += rate;
-            if (y >= 0)
+            if (y >= 1.0 / 2 * step_length)
             {
-                y = 0;
+                y = 1.0 / 2 * step_length;
                 swing = true;
             }
-            z = -back_step_depth * sin(2 * PI / (step_length * 2) * (y + step_length));
+            z = -back_step_depth * sin(2 * PI / (step_length * 2) * (y + 1.0 / 2 * step_length));
         }
     }
 
@@ -101,22 +101,22 @@ void Trajectory::interpolateNext(int speed) // speed can be a value from 0 to 10
         if (swing)
         {
             x += rate;
-            if (x >= side_step_length)
+            if (x >= 1.0 / 2 * side_step_length)
             {
-                x = side_step_length;
+                x = 1.0 / 2 * side_step_length;
                 swing = false;
             }
-            z = side_step_height * sin(2 * PI / (side_step_length * 2) * x);
+            z = side_step_height * sin(2 * PI / (side_step_length * 2) * (x + 1.0 / 2 * side_step_length));
         }
         else
         {
             x -= rate;
-            if (x <= 0)
+            if (x <= -1.0 / 2 * side_step_length)
             {
-                x = 0;
+                x = -1.0 / 2 * side_step_length;
                 swing = true;
             }
-            z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * x);
+            z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * (x + 1.0 / 2 * side_step_length));
         }
     }
 
@@ -126,22 +126,22 @@ void Trajectory::interpolateNext(int speed) // speed can be a value from 0 to 10
         if (swing)
         {
             x -= rate;
-            if (x <= -side_step_length)
+            if (x <= -1.0 / 2 * side_step_length)
             {
-                x = -side_step_length;
+                x = -1.0 / 2 * side_step_length;
                 swing = false;
             }
-            z = side_step_height * sin(2 * PI / (side_step_length * 2) * (x + side_step_length));
+            z = side_step_height * sin(2 * PI / (side_step_length * 2) * (x + 1.0 / 2 * side_step_length));
         }
         else
         {
             x += rate;
-            if (x >= 0)
+            if (x >= 1.0 / 2 * side_step_length)
             {
-                x = 0;
+                x = 1.0 / 2 * side_step_length;
                 swing = true;
             }
-            z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * (x + side_step_length));
+            z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * (x + 1.0 / 2 * side_step_length));
         }
     }
 
@@ -153,22 +153,22 @@ void Trajectory::interpolateNext(int speed) // speed can be a value from 0 to 10
             if (swing)
             {
                 x -= rate;
-                if (x <= 0)
+                if (x <= -1.0 / 2 * side_step_length)
                 {
-                    x = 0;
+                    x = -1.0 / 2 * side_step_length;
                     swing = false;
                 }
-                z = side_step_height * sin(2 * PI / (side_step_length * 2) * x);
+                z = side_step_height * sin(2 * PI / (side_step_length * 2) * (x + 1.0 / 2 * side_step_length));
             }
             else
             {
                 x += rate;
-                if (x >= side_step_length)
+                if (x >= 1.0 / 2 * side_step_length)
                 {
-                    x = side_step_length;
+                    x = 1.0 / 2 * side_step_length;
                     swing = true;
                 }
-                z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * x);
+                z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * (x + 1.0 / 2 * side_step_length));
             }
         }
         else if (leg == 2)
@@ -176,22 +176,22 @@ void Trajectory::interpolateNext(int speed) // speed can be a value from 0 to 10
             if (swing)
             {
                 x -= rate;
-                if (x <= -side_step_length)
+                if (x <= -1.0 / 2 * side_step_length)
                 {
-                    x = -side_step_length;
+                    x = -1.0 / 2 * side_step_length;
                     swing = false;
                 }
-                z = side_step_height * sin(2 * PI / (side_step_length * 2) * (x + side_step_length));
+                z = side_step_height * sin(2 * PI / (side_step_length * 2) * (x + 1.0 / 2 * side_step_length));
             }
             else
             {
                 x += rate;
-                if (x >= 0)
+                if (x >= 1.0 / 2 * side_step_length)
                 {
-                    x = 0;
+                    x = 1.0 / 2 * side_step_length;
                     swing = true;
                 }
-                z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * (x + side_step_length));
+                z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * (x + 1.0 / 2 * side_step_length));
             }
         }
         else if (leg == 3)
@@ -199,22 +199,22 @@ void Trajectory::interpolateNext(int speed) // speed can be a value from 0 to 10
             if (swing)
             {
                 x += rate;
-                if (x >= side_step_length)
+                if (x >= 1.0 / 2 * side_step_length)
                 {
-                    x = side_step_length;
+                    x = 1.0 / 2 * side_step_length;
                     swing = false;
                 }
-                z = side_step_height * sin(2 * PI / (side_step_length * 2) * x);
+                z = side_step_height * sin(2 * PI / (side_step_length * 2) * (x + 1.0 / 2 * side_step_length));
             }
             else
             {
                 x -= rate;
-                if (x <= 0)
+                if (x <= -1.0 / 2 * side_step_length)
                 {
-                    x = 0;
+                    x = -1.0 / 2 * side_step_length;
                     swing = true;
                 }
-                z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * x);
+                z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * (x + 1.0 / 2 * side_step_length));
             }
         }
         else if (leg == 4)
@@ -222,22 +222,22 @@ void Trajectory::interpolateNext(int speed) // speed can be a value from 0 to 10
             if (swing)
             {
                 x += rate;
-                if (x >= 0)
+                if (x >= 1.0 / 2 * side_step_length)
                 {
-                    x = 0;
+                    x = 1.0 / 2 * side_step_length;
                     swing = false;
                 }
-                z = side_step_height * sin(2 * PI / (side_step_length * 2) * (x + side_step_length));
+                z = side_step_height * sin(2 * PI / (side_step_length * 2) * (x + 1.0 / 2 * side_step_length));
             }
             else
             {
                 x -= rate;
-                if (x <= -side_step_length)
+                if (x <= -1.0 / 2 * side_step_length)
                 {
-                    x = -side_step_length;
+                    x = -1.0 / 2 * side_step_length;
                     swing = true;
                 }
-                z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * (x + side_step_length));
+                z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * (x + 1.0 / 2 * side_step_length));
             }
         }
     }
@@ -249,22 +249,22 @@ void Trajectory::interpolateNext(int speed) // speed can be a value from 0 to 10
             if (swing)
             {
                 x += rate;
-                if (x >= side_step_length)
+                if (x >= 1.0 / 2 * side_step_length)
                 {
-                    x = side_step_length;
+                    x = 1.0 / 2 * side_step_length;
                     swing = false;
                 }
-                z = side_step_height * sin(2 * PI / (side_step_length * 2) * x);
+                z = side_step_height * sin(2 * PI / (side_step_length * 2) * (x + 1.0 / 2 * side_step_length));
             }
             else
             {
                 x -= rate;
-                if (x <= 0)
+                if (x <= -1.0 / 2 * side_step_length)
                 {
-                    x = 0;
+                    x = -1.0 / 2 * side_step_length;
                     swing = true;
                 }
-                z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * x);
+                z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * (x + 1.0 / 2 * side_step_length));
             }
         }
         else if (leg == 2)
@@ -272,22 +272,22 @@ void Trajectory::interpolateNext(int speed) // speed can be a value from 0 to 10
             if (swing)
             {
                 x += rate;
-                if (x >= 0)
+                if (x >= 1.0 / 2 * side_step_length)
                 {
-                    x = 0;
+                    x = 1.0 / 2 * side_step_length;
                     swing = false;
                 }
-                z = side_step_height * sin(2 * PI / (side_step_length * 2) * (x + side_step_length));
+                z = side_step_height * sin(2 * PI / (side_step_length * 2) * (x + 1.0 / 2 * side_step_length));
             }
             else
             {
                 x -= rate;
-                if (x <= -side_step_length)
+                if (x <= -1.0 / 2 * side_step_length)
                 {
-                    x = -side_step_length;
+                    x = -1.0 / 2 * side_step_length;
                     swing = true;
                 }
-                z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * (x + side_step_length));
+                z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * (x + 1.0 / 2 * side_step_length));
             }
         }
         else if (leg == 3)
@@ -295,22 +295,22 @@ void Trajectory::interpolateNext(int speed) // speed can be a value from 0 to 10
             if (swing)
             {
                 x -= rate;
-                if (x <= 0)
+                if (x <= -1.0 / 2 * side_step_length)
                 {
-                    x = 0;
+                    x = -1.0 / 2 * side_step_length;
                     swing = false;
                 }
-                z = side_step_height * sin(2 * PI / (side_step_length * 2) * x);
+                z = side_step_height * sin(2 * PI / (side_step_length * 2) * (x + 1.0 / 2 * side_step_length));
             }
             else
             {
                 x += rate;
-                if (x >= side_step_length)
+                if (x >= 1.0 / 2 * side_step_length)
                 {
-                    x = side_step_length;
+                    x = 1.0 / 2 * side_step_length;
                     swing = true;
                 }
-                z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * x);
+                z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * (x + 1.0 / 2 * side_step_length));
             }
         }
         else if (leg == 4)
@@ -318,22 +318,22 @@ void Trajectory::interpolateNext(int speed) // speed can be a value from 0 to 10
             if (swing)
             {
                 x -= rate;
-                if (x <= -side_step_length)
+                if (x <= -1.0 / 2 * side_step_length)
                 {
-                    x = -side_step_length;
+                    x = -1.0 / 2 * side_step_length;
                     swing = false;
                 }
-                z = side_step_height * sin(2 * PI / (side_step_length * 2) * (x + side_step_length));
+                z = side_step_height * sin(2 * PI / (side_step_length * 2) * (x + 1.0 / 2 * side_step_length));
             }
             else
             {
                 x += rate;
-                if (x >= 0)
+                if (x >= 1.0 / 2 * side_step_length)
                 {
-                    x = 0;
+                    x = 1.0 / 2 * side_step_length;
                     swing = true;
                 }
-                z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * (x + side_step_length));
+                z = -side_back_step_depth * sin(2 * PI / (side_step_length * 2) * (x + 1.0 / 2 * side_step_length));
             }
         }
     }
@@ -353,14 +353,14 @@ void Trajectory::setDir(char dir_val)
         {
             swing = true;
             x = 0;
-            y = 0;
+            y = -1.0 / 2 * step_length;
             z = 0;
         }
         else if (leg == 2 || leg == 3)
         {
             swing = false;
             x = 0;
-            y = step_length;
+            y = 1.0 / 2 * step_length;
             z = 0;
         }
     }
@@ -370,14 +370,14 @@ void Trajectory::setDir(char dir_val)
         {
             swing = true;
             x = 0;
-            y = 0;
+            y = 1.0 / 2 * step_length;
             z = 0;
         }
         else if (leg == 2 || leg == 3)
         {
             swing = false;
             x = 0;
-            y = -step_length;
+            y = -1.0 / 2 * step_length;
             z = 0;
         }
     }
@@ -386,14 +386,14 @@ void Trajectory::setDir(char dir_val)
         if (leg == 1 || leg == 4)
         {
             swing = true;
-            x = 0;
+            x = -1.0 / 2 * side_step_length;
             y = 0;
             z = 0;
         }
         else if (leg == 2 || leg == 3)
         {
             swing = false;
-            x = side_step_length;
+            x = 1.0 / 2 * side_step_length;
             y = 0;
             z = 0;
         }
@@ -403,14 +403,14 @@ void Trajectory::setDir(char dir_val)
         if (leg == 1 || leg == 4)
         {
             swing = true;
-            x = 0;
+            x = 1.0 / 2 * side_step_length;
             y = 0;
             z = 0;
         }
         else if (leg == 2 || leg == 3)
         {
             swing = false;
-            x = -side_step_length;
+            x = -1.0 / 2 * side_step_length;
             y = 0;
             z = 0;
         }
@@ -420,14 +420,14 @@ void Trajectory::setDir(char dir_val)
         if (leg == 1 || leg == 4)
         {
             swing = true;
-            x = 0;
+            x = -1.0 / 2 * side_step_length;
             y = 0;
             z = 0;
         }
         else if (leg == 2 || leg == 3)
         {
             swing = false;
-            x = 0;
+            x = 1.0 / 2 * side_step_length;
             y = 0;
             z = 0;
         }
@@ -437,14 +437,14 @@ void Trajectory::setDir(char dir_val)
         if (leg == 2 || leg == 3)
         {
             swing = true;
-            x = 0;
+            x = -1.0 / 2 * side_step_length;
             y = 0;
             z = 0;
         }
         else if (leg == 1 || leg == 4)
         {
             swing = false;
-            x = 0;
+            x = 1.0 / 2 * side_step_length;
             y = 0;
             z = 0;
         }

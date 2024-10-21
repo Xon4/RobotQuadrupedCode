@@ -48,7 +48,6 @@ class Trajectory:
             self.y = 1/2*STEP_LENGTH
             self.z = 0
         self.interpolations = 20
-        self.stopParam = 0
     
     def interpolate(self, speed): 
         # speed should be between 0 and 100
@@ -221,7 +220,6 @@ class Trajectory:
                         self.x = -1/2*SIDE_STEP_LENGTH
                         self.phase = "swing"
                     self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + 1/2*SIDE_STEP_LENGTH)) - GROUND_DEPTH
-        self.stopParam = 0
                 
     def checkGrounded(self):
         return (self.x == 0 and self.y == 0 and self.z == -GROUND_DEPTH)
@@ -427,8 +425,6 @@ def drawLegs():
 dirState = "still"
 newKey = ""
 prevKey = ""
-stopInput = False
-stopMotion = False
 changedKey = False
 
 
@@ -448,8 +444,6 @@ def animate(frame):
 
     global newKey
     global prevKey
-    global stopInput
-    global stopMotion
     global dirState
     global changedKey
    

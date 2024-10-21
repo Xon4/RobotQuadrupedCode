@@ -92,12 +92,12 @@ void setup()
   pwm.writeMicroseconds(FR_hip, map(FR_leg.get_hip_angle(), 0, 180, 1300, 2200));
   pwm.writeMicroseconds(FR_knee, map(FR_leg.get_knee_angle(), 0, 180, 1000, 2200));
 
-  pwm.writeMicroseconds(FL_abad, map(FL_leg.get_abad_angle(), 0, 180, 950, 2200));
+  pwm.writeMicroseconds(FL_abad, map(FL_leg.get_abad_angle(), 0, 180, 1000, 2200));
   pwm.writeMicroseconds(FL_hip, map(FL_leg.get_hip_angle(), 0, 180, 800, 2200));
   pwm.writeMicroseconds(FL_knee, map(FL_leg.get_knee_angle(), 0, 180, 800, 1900));
 
   pwm.writeMicroseconds(BR_abad, map(BR_leg.get_abad_angle(), 0, 180, 900, 2200));
-  pwm.writeMicroseconds(BR_hip, map(BR_leg.get_hip_angle(), 0, 180, 1300, 2200));
+  pwm.writeMicroseconds(BR_hip, map(BR_leg.get_hip_angle(), 0, 180, 1500, 2200));
   pwm.writeMicroseconds(BR_knee, map(BR_leg.get_knee_angle(), 0, 180, 1000, 2200));
 
   pwm.writeMicroseconds(BL_abad, map(BL_leg.get_abad_angle(), 0, 180, 1000, 2200));
@@ -178,12 +178,12 @@ void loop()
     pwm.writeMicroseconds(FR_hip, map(FR_leg.get_hip_angle(), 0, 180, 1300, 2200));
     pwm.writeMicroseconds(FR_knee, map(FR_leg.get_knee_angle(), 0, 180, 1000, 2200));
 
-    pwm.writeMicroseconds(FL_abad, map(FL_leg.get_abad_angle(), 0, 180, 950, 2200));
+    pwm.writeMicroseconds(FL_abad, map(FL_leg.get_abad_angle(), 0, 180, 1000, 2200));
     pwm.writeMicroseconds(FL_hip, map(FL_leg.get_hip_angle(), 0, 180, 800, 2200));
     pwm.writeMicroseconds(FL_knee, map(FL_leg.get_knee_angle(), 0, 180, 800, 1900));
 
     pwm.writeMicroseconds(BR_abad, map(BR_leg.get_abad_angle(), 0, 180, 900, 2200));
-    pwm.writeMicroseconds(BR_hip, map(BR_leg.get_hip_angle(), 0, 180, 1300, 2200));
+    pwm.writeMicroseconds(BR_hip, map(BR_leg.get_hip_angle(), 0, 180, 1500, 2200));
     pwm.writeMicroseconds(BR_knee, map(BR_leg.get_knee_angle(), 0, 180, 1000, 2200));
 
     pwm.writeMicroseconds(BL_abad, map(BL_leg.get_abad_angle(), 0, 180, 1000, 2200));
