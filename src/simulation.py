@@ -40,12 +40,12 @@ class Trajectory:
         if self.leg == "FR" or self.leg == "BL":
             self.phase = "swing"
             self.x = 0
-            self.y = 0
+            self.y = -1/2*STEP_LENGTH
             self.z = 0
         elif self.leg == "FL" or self.leg == "BR":
             self.phase = "support"
             self.x = 0
-            self.y = STEP_LENGTH
+            self.y = 1/2*STEP_LENGTH
             self.z = 0
         self.interpolations = 20
         self.stopParam = 0
@@ -71,191 +71,158 @@ class Trajectory:
             rate = STEP_LENGTH / (self.interpolations - (speed / 100.0 * 18))
             if self.phase == "swing":
                 self.y -= rate
-                if self.y <= -STEP_LENGTH:
-                    self.y = -STEP_LENGTH
+                if self.y <= -1/2*STEP_LENGTH:
+                    self.y = -1/2*STEP_LENGTH
                     self.phase = "support"
-                self.z = STEP_HEIGHT * math.sin(2 * math.pi / (STEP_LENGTH * 2) * (self.y + STEP_LENGTH)) - GROUND_DEPTH
+                self.z = STEP_HEIGHT * math.sin(2 * math.pi / (STEP_LENGTH * 2) * (self.y + 1/2*STEP_LENGTH)) - GROUND_DEPTH
             elif self.phase == "support":
                 self.y += rate
-                if self.y >= 0:
-                    self.y = 0
+                if self.y >= 1/2*STEP_LENGTH:
+                    self.y = 1/2*STEP_LENGTH
                     self.phase = "swing"
-                self.z = -BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * (self.y + STEP_LENGTH)) - GROUND_DEPTH
+                self.z = -BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * (self.y + 1/2*STEP_LENGTH)) - GROUND_DEPTH
        
         elif self.dir == "right":
             rate = SIDE_STEP_LENGTH / (self.interpolations - (speed / 100.0 * 18))
             if self.phase == "swing":
                 self.x += rate
-                if self.x >= SIDE_STEP_LENGTH:
-                    self.x = SIDE_STEP_LENGTH
+                if self.x >= 1/2*SIDE_STEP_LENGTH:
+                    self.x = 1/2*SIDE_STEP_LENGTH
                     self.phase = "support"
-                self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
+                self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + 1/2*SIDE_STEP_LENGTH)) - GROUND_DEPTH
             elif self.phase == "support":
                 self.x -= rate
-                if self.x <= 0:
-                    self.x = 0
+                if self.x <= -1/2*SIDE_STEP_LENGTH:
+                    self.x = -1/2*SIDE_STEP_LENGTH
                     self.phase = "swing"
-                self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
+                self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + 1/2*SIDE_STEP_LENGTH)) - GROUND_DEPTH
         
         elif self.dir == "left":
             rate = SIDE_STEP_LENGTH / (self.interpolations - (speed / 100.0 * 18))
             if self.phase == "swing":
                 self.x -= rate
-                if self.x <= -SIDE_STEP_LENGTH:
-                    self.x = -SIDE_STEP_LENGTH
+                if self.x <= -1/2*SIDE_STEP_LENGTH:
+                    self.x = -1/2*SIDE_STEP_LENGTH
                     self.phase = "support"
-                self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
+                self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + 1/2*SIDE_STEP_LENGTH)) - GROUND_DEPTH
             elif self.phase == "support":
                 self.x += rate
-                if self.x >= 0:
-                    self.x = 0
+                if self.x >= 1/2*SIDE_STEP_LENGTH:
+                    self.x = 1/2*SIDE_STEP_LENGTH
                     self.phase = "swing"
-                self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
+                self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + 1/2*SIDE_STEP_LENGTH)) - GROUND_DEPTH
         
         elif self.dir == "right_turn":
             rate = SIDE_STEP_LENGTH / (self.interpolations - (speed / 100.0 * 18))
             if self.leg == "FR":
                 if self.phase == "swing":
                     self.x += rate
-                    if self.x >= SIDE_STEP_LENGTH:
-                        self.x = SIDE_STEP_LENGTH
+                    if self.x >= 1/2*SIDE_STEP_LENGTH:
+                        self.x = 1/2*SIDE_STEP_LENGTH
                         self.phase = "support"
-                    self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
+                    self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + 1/2*SIDE_STEP_LENGTH)) - GROUND_DEPTH
                 elif self.phase == "support":
                     self.x -= rate
-                    if self.x <= 0:
-                        self.x = 0
+                    if self.x <= -1/2*SIDE_STEP_LENGTH:
+                        self.x = -1/2*SIDE_STEP_LENGTH
                         self.phase = "swing"
-                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
+                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + 1/2*SIDE_STEP_LENGTH)) - GROUND_DEPTH
             elif self.leg == "FL":
                 if self.phase == "swing":
                     self.x += rate
-                    if self.x >= 0:
-                        self.x = 0
+                    if self.x >= 1/2*SIDE_STEP_LENGTH:
+                        self.x = 1/2*SIDE_STEP_LENGTH
                         self.phase = "support"
-                    self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
+                    self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + 1/2*SIDE_STEP_LENGTH)) - GROUND_DEPTH
                 elif self.phase == "support":
                     self.x -= rate
-                    if self.x <= -SIDE_STEP_LENGTH:
-                        self.x = -SIDE_STEP_LENGTH
+                    if self.x <= -1/2*SIDE_STEP_LENGTH:
+                        self.x = -1/2*SIDE_STEP_LENGTH
                         self.phase = "swing"
-                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
+                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + 1/2*SIDE_STEP_LENGTH)) - GROUND_DEPTH
             elif self.leg == "BR":
                 if self.phase == "swing":
                     self.x -= rate
-                    if self.x <= 0:
-                        self.x = 0
+                    if self.x <= -1/2*SIDE_STEP_LENGTH:
+                        self.x = -1/2*SIDE_STEP_LENGTH
                         self.phase = "support"
-                    self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
+                    self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + 1/2*SIDE_STEP_LENGTH)) - GROUND_DEPTH
                 elif self.phase == "support":
                     self.x += rate
-                    if self.x >= SIDE_STEP_LENGTH:
-                        self.x = SIDE_STEP_LENGTH
+                    if self.x >= 1/2*SIDE_STEP_LENGTH:
+                        self.x = 1/2*SIDE_STEP_LENGTH
                         self.phase = "swing"
-                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
+                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + 1/2*SIDE_STEP_LENGTH)) - GROUND_DEPTH
             elif self.leg == "BL":
                 if self.phase == "swing":
                     self.x -= rate
-                    if self.x <= -SIDE_STEP_LENGTH:
-                        self.x = -SIDE_STEP_LENGTH
+                    if self.x <= -1/2*SIDE_STEP_LENGTH:
+                        self.x = -1/2*SIDE_STEP_LENGTH
                         self.phase = "support"
-                    self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
+                    self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + 1/2*SIDE_STEP_LENGTH)) - GROUND_DEPTH
                 elif self.phase == "support":
                     self.x += rate
-                    if self.x >= 0:
-                        self.x = 0
+                    if self.x >= 1/2*SIDE_STEP_LENGTH:
+                        self.x = 1/2*SIDE_STEP_LENGTH
                         self.phase = "swing"
-                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
+                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + 1/2*SIDE_STEP_LENGTH)) - GROUND_DEPTH
             
         elif self.dir == "left_turn":
             rate = SIDE_STEP_LENGTH / (self.interpolations - (speed / 100.0 * 18))
             if self.leg == "FR":
                 if self.phase == "swing":
                     self.x -= rate
-                    if self.x <= 0:
-                        self.x = 0
+                    if self.x <= -1/2*SIDE_STEP_LENGTH:
+                        self.x = -1/2*SIDE_STEP_LENGTH
                         self.phase = "support"
-                    self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
+                    self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + 1/2*SIDE_STEP_LENGTH)) - GROUND_DEPTH
                 elif self.phase == "support":
                     self.x += rate
-                    if self.x >= SIDE_STEP_LENGTH:
-                        self.x = SIDE_STEP_LENGTH
+                    if self.x >= 1/2*SIDE_STEP_LENGTH:
+                        self.x = 1/2*SIDE_STEP_LENGTH
                         self.phase = "swing"
-                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
+                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + 1/2*SIDE_STEP_LENGTH)) - GROUND_DEPTH
             elif self.leg == "FL":
                 if self.phase == "swing":
                     self.x -= rate
-                    if self.x <= -SIDE_STEP_LENGTH:
-                        self.x = -SIDE_STEP_LENGTH
+                    if self.x <= -1/2*SIDE_STEP_LENGTH:
+                        self.x = -1/2*SIDE_STEP_LENGTH
                         self.phase = "support"
-                    self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
+                    self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + 1/2*SIDE_STEP_LENGTH)) - GROUND_DEPTH
                 elif self.phase == "support":
                     self.x += rate
-                    if self.x >= 0:
-                        self.x = 0
+                    if self.x >= 1/2*SIDE_STEP_LENGTH:
+                        self.x = 1/2*SIDE_STEP_LENGTH
                         self.phase = "swing"
-                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
+                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + 1/2*SIDE_STEP_LENGTH)) - GROUND_DEPTH
             elif self.leg == "BR":
                 if self.phase == "swing":
                     self.x += rate
-                    if self.x >= SIDE_STEP_LENGTH:
-                        self.x = SIDE_STEP_LENGTH
+                    if self.x >= 1/2*SIDE_STEP_LENGTH:
+                        self.x = 1/2*SIDE_STEP_LENGTH
                         self.phase = "support"
-                    self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
+                    self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + 1/2*SIDE_STEP_LENGTH)) - GROUND_DEPTH
                 elif self.phase == "support":
                     self.x -= rate
-                    if self.x <= 0:
-                        self.x = 0
+                    if self.x <= -1/2*SIDE_STEP_LENGTH:
+                        self.x = -1/2*SIDE_STEP_LENGTH
                         self.phase = "swing"
-                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
+                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + 1/2*SIDE_STEP_LENGTH)) - GROUND_DEPTH
             elif self.leg == "BL":
                 if self.phase == "swing":
                     self.x += rate
-                    if self.x >= 0:
-                        self.x = 0
+                    if self.x >= 1/2*SIDE_STEP_LENGTH:
+                        self.x = 1/2*SIDE_STEP_LENGTH
                         self.phase = "support"
-                    self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
+                    self.z = SIDE_STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + 1/2*SIDE_STEP_LENGTH)) - GROUND_DEPTH
                 elif self.phase == "support":
                     self.x -= rate
-                    if self.x <= -SIDE_STEP_LENGTH:
-                        self.x = -SIDE_STEP_LENGTH
+                    if self.x <= -1/2*SIDE_STEP_LENGTH:
+                        self.x = -1/2*SIDE_STEP_LENGTH
                         self.phase = "swing"
-                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
+                    self.z = - SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + 1/2*SIDE_STEP_LENGTH)) - GROUND_DEPTH
         self.stopParam = 0
-        
-    def stop(self):
-        if self.x == 0:
-            rate = STEP_LENGTH / 5
-            if self.phase == "support":
-                if self.y > 0:
-                    self.y -= rate
-                    self.z = -BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * self.y) - GROUND_DEPTH
-                elif self.y < 0:
-                    self.y += rate
-                    self.z = -BACK_STEP_DEPTH * math.sin(2 * math.pi / (STEP_LENGTH * 2) * (self.y + STEP_LENGTH)) - GROUND_DEPTH
-            elif self.phase == "swing":
-                if self.stopParam < STEP_LENGTH:
-                    self.stopParam += rate
-                    self.z = STEP_HEIGHT * math.sin(2 * math.pi / (STEP_LENGTH * 2) * self.stopParam) - GROUND_DEPTH
-        elif self.y == 0:
-            rate = SIDE_STEP_LENGTH / 5
-            if self.phase == "support":
-                if self.x > 0:
-                    self.x -= rate
-                    self.z = -SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * self.x) - GROUND_DEPTH
-                elif self.x < 0:
-                    self.x += rate
-                    self.z = -SIDE_BACK_STEP_DEPTH * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * (self.x + SIDE_STEP_LENGTH)) - GROUND_DEPTH
-            elif self.phase == "swing":
-                if self.stopParam < SIDE_STEP_LENGTH:
-                    self.stopParam += rate
-                    self.z = STEP_HEIGHT * math.sin(2 * math.pi / (SIDE_STEP_LENGTH * 2) * self.stopParam) - GROUND_DEPTH
-        
-        if self.x == 0 and self.y == 0 and self.z == -GROUND_DEPTH:
-            return True
-        return False
                 
-    
     def checkGrounded(self):
         return (self.x == 0 and self.y == 0 and self.z == -GROUND_DEPTH)
         
@@ -276,55 +243,55 @@ class Trajectory:
             if self.leg == "FR" or self.leg == "BL":
                 self.phase = "swing"
                 self.x = 0
-                self.y = 0
+                self.y = 1/2*STEP_LENGTH
                 self.z = 0
             elif self.leg == "FL" or self.leg == "BR":
                 self.phase = "support"
                 self.x = 0
-                self.y = -STEP_LENGTH
+                self.y = -1/2*STEP_LENGTH
                 self.z = 0
         elif self.dir == "right":
             if self.leg == "FR" or self.leg == "BL":
                 self.phase = "swing"
-                self.x = 0
+                self.x = -1/2*SIDE_STEP_LENGTH
                 self.y = 0
                 self.z = 0
             elif self.leg == "FL" or self.leg == "BR":
                 self.phase = "support"
-                self.x = SIDE_STEP_LENGTH
+                self.x = 1/2*SIDE_STEP_LENGTH
                 self.y = 0
                 self.z = 0
         elif self.dir == "left":
             if self.leg == "FR" or self.leg == "BL":
                 self.phase = "swing"
-                self.x = 0
+                self.x = 1/2*SIDE_STEP_LENGTH
                 self.y = 0
                 self.z = 0
             elif self.leg == "FL" or self.leg == "BR":
                 self.phase = "support"
-                self.x = -SIDE_STEP_LENGTH
+                self.x = -1/2*SIDE_STEP_LENGTH
                 self.y = 0
                 self.z = 0
         elif self.dir == "right_turn":
             if self.leg == "FR" or self.leg == "BL":
                 self.phase = "swing"
-                self.x = 0
+                self.x = -1/2*SIDE_STEP_LENGTH
                 self.y = 0
                 self.z = 0
             elif self.leg == "FL" or self.leg == "BR":
                 self.phase = "support"
-                self.x = 0
+                self.x = 1/2*SIDE_STEP_LENGTH
                 self.y = 0
                 self.z = 0 
         elif self.dir == "left_turn":
             if self.leg == "FL" or self.leg == "BR":
                 self.phase = "swing"
-                self.x = 0
+                self.x = -1/2*SIDE_STEP_LENGTH
                 self.y = 0
                 self.z = 0
             elif self.leg == "FR" or self.leg == "BL":
                 self.phase = "support"
-                self.x = 0
+                self.x = 1/2*SIDE_STEP_LENGTH
                 self.y = 0
                 self.z = 0
         elif self.dir == "still":
@@ -404,6 +371,8 @@ def drawLegs():
     FL_footPos = translateTrajectory([FL_trajectory.getX(), FL_trajectory.getY(), FL_trajectory.getZ()], "FL")
     BR_footPos = translateTrajectory([BR_trajectory.getX(), BR_trajectory.getY(), BR_trajectory.getZ()], "BR")
     BL_footPos = translateTrajectory([BL_trajectory.getX(), BL_trajectory.getY(), BL_trajectory.getZ()], "BL")
+    
+    print(FR_footPos)
     
     #draw feet as points
     ax.scatter(FR_footPos[0], FR_footPos[1], FR_footPos[2], color='black', s=100, label='Point')
@@ -485,15 +454,8 @@ def animate(frame):
     global changedKey
    
     
-    prevKey = newKey
-    newKey = keyboard.get_hotkey_name()
     
-    if prevKey != newKey and prevKey != "":
-        changedKey = True
-        
-    if changedKey and FR_trajectory.checkGrounded():
-        stopInput = True
-        changedKey = False
+    newKey = keyboard.get_hotkey_name()
 
     if newKey == "up":
         dirState = "forward"
@@ -503,32 +465,19 @@ def animate(frame):
         dirState = "right_turn"
     elif newKey == "left":
         dirState = "left_turn"
+    elif newKey == "":
+        dirState = "still"
     
     if FR_trajectory.getDir() != dirState:
         FR_trajectory.setDir(dirState)
         FL_trajectory.setDir(dirState)
         BR_trajectory.setDir(dirState)
         BL_trajectory.setDir(dirState)
-    
-    if stopInput and FR_trajectory.checkGrounded():
-        stopMotion = True
-        
-    if stopMotion:
-        if (FR_trajectory.stop() or BL_trajectory.stop()) and (FL_trajectory.stop() or BR_trajectory.stop()):
-                dirState = "still"
-                stopInput = False
-                stopMotion = False
-        FR_trajectory.stop()
-        FL_trajectory.stop()
-        BR_trajectory.stop()
-        BL_trajectory.stop()
-        
-    else:
        
-        FR_trajectory.interpolate(gaitSpeed)
-        FL_trajectory.interpolate(gaitSpeed)
-        BR_trajectory.interpolate(gaitSpeed)
-        BL_trajectory.interpolate(gaitSpeed)
+    FR_trajectory.interpolate(gaitSpeed)
+    FL_trajectory.interpolate(gaitSpeed)
+    BR_trajectory.interpolate(gaitSpeed)
+    BL_trajectory.interpolate(gaitSpeed)
     
 
     # FR_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
