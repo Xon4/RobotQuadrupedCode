@@ -271,27 +271,47 @@ class Trajectory:
                 self.y = 0
                 self.z = 0
         elif self.dir == "right_turn":
-            if self.leg == "FR" or self.leg == "BL":
+            if self.leg == "FR":
                 self.phase = "swing"
                 self.x = -1/2*SIDE_STEP_LENGTH
                 self.y = 0
                 self.z = 0
-            elif self.leg == "FL" or self.leg == "BR":
+            elif self.leg == "BL":
+                self.phase = "swing"
+                self.x = 1/2*SIDE_STEP_LENGTH
+                self.y = 0
+                self.z = 0
+            elif self.leg == "FL":
                 self.phase = "support"
                 self.x = 1/2*SIDE_STEP_LENGTH
                 self.y = 0
                 self.z = 0 
+            elif self.leg == "BR":
+                self.phase = "support"
+                self.x = -1/2*SIDE_STEP_LENGTH
+                self.y = 0
+                self.z = 0 
         elif self.dir == "left_turn":
-            if self.leg == "FL" or self.leg == "BR":
+            if self.leg == "FL":
+                self.phase = "swing"
+                self.x = 1/2*SIDE_STEP_LENGTH
+                self.y = 0
+                self.z = 0
+            elif self.leg == "BR":
                 self.phase = "swing"
                 self.x = -1/2*SIDE_STEP_LENGTH
                 self.y = 0
                 self.z = 0
-            elif self.leg == "FR" or self.leg == "BL":
+            elif self.leg == "FR":
+                self.phase = "support"
+                self.x = -1/2*SIDE_STEP_LENGTH
+                self.y = 0
+                self.z = 0
+            elif self.leg == "BL":
                 self.phase = "support"
                 self.x = 1/2*SIDE_STEP_LENGTH
                 self.y = 0
-                self.z = 0
+                self.z = 0 
         elif self.dir == "still":
             self.x = 0
             self.y = 0

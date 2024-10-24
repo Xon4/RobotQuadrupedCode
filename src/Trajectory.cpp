@@ -10,8 +10,8 @@ Trajectory::Trajectory(float step_length_init, float step_height_init, float bac
     side_step_length = side_step_length_init;
     side_step_height = side_step_height_init;
     side_back_step_depth = side_back_step_depth_init;
-    interpolations = 40;
-    speed_factor = 20;
+    interpolations = 20;
+    speed_factor = 10;
     dir = 'F';
     if (leg == 4 || leg == 1)
     {
@@ -417,31 +417,59 @@ void Trajectory::setDir(char dir_val)
     }
     else if (dir == 'r')
     {
-        if (leg == 1 || leg == 4)
+        if (leg == 1)
         {
             swing = true;
             x = -1.0 / 2 * side_step_length;
             y = 0;
             z = 0;
         }
-        else if (leg == 2 || leg == 3)
+        else if (leg == 4)
+        {
+            swing = true;
+            x = 1.0 / 2 * side_step_length;
+            y = 0;
+            z = 0;
+        }
+        else if (leg == 2)
         {
             swing = false;
             x = 1.0 / 2 * side_step_length;
             y = 0;
             z = 0;
         }
+        else if (leg == 3)
+        {
+            swing = false;
+            x = -1.0 / 2 * side_step_length;
+            y = 0;
+            z = 0;
+        }
     }
     else if (dir == 'l')
     {
-        if (leg == 2 || leg == 3)
+        if (leg == 2)
+        {
+            swing = true;
+            x = 1.0 / 2 * side_step_length;
+            y = 0;
+            z = 0;
+        }
+        if (leg == 3)
         {
             swing = true;
             x = -1.0 / 2 * side_step_length;
             y = 0;
             z = 0;
         }
-        else if (leg == 1 || leg == 4)
+        else if (leg == 1)
+        {
+            swing = false;
+            x = -1.0 / 2 * side_step_length;
+            y = 0;
+            z = 0;
+        }
+        else if (leg == 4)
         {
             swing = false;
             x = 1.0 / 2 * side_step_length;
@@ -453,7 +481,7 @@ void Trajectory::setDir(char dir_val)
     {
         x = 0;
         y = 0;
-        z = 0;
+        z = 20;
     }
 }
 

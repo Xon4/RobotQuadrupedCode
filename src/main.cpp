@@ -45,14 +45,14 @@ const float L3 = 37.8;
 // const float SIDE_BACK_STEP_DEPTH = 10;
 // const float GROUND_DEPTH = 180;
 
-const float STEP_LENGTH = 50;
-const float STEP_HEIGHT = 60;
-const float BACK_STEP_DEPTH = 10;
+const float STEP_LENGTH = 70;
+const float STEP_HEIGHT = 100;
+const float BACK_STEP_DEPTH = 1;
 const float SIDE_STEP_LENGTH = 30;
 const float SIDE_STEP_HEIGHT = 40;
 const float SIDE_BACK_STEP_DEPTH = 5;
-const float FRONT_GROUND_DEPTH = 180;
-const float BACK_GROUND_DEPTH = 190;
+const float FRONT_GROUND_DEPTH = 230;
+const float BACK_GROUND_DEPTH = 235;
 
 // controller input variables
 char input_dir = 'S';
@@ -83,10 +83,10 @@ void setup()
   pwm.setPWMFreq(SERVO_FREQ);
   Serial.begin(9600);
 
-  FR_leg.updateAngles(L3, 0, -FRONT_GROUND_DEPTH);
-  FL_leg.updateAngles(L3, 0, -FRONT_GROUND_DEPTH);
-  BR_leg.updateAngles(L3, 0, -BACK_GROUND_DEPTH);
-  BL_leg.updateAngles(L3, 0, -BACK_GROUND_DEPTH);
+  FR_leg.updateAngles(L3, 0, -FRONT_GROUND_DEPTH + 20);
+  FL_leg.updateAngles(L3, 0, -FRONT_GROUND_DEPTH + 20);
+  BR_leg.updateAngles(L3, 0, -BACK_GROUND_DEPTH + 20);
+  BL_leg.updateAngles(L3, 0, -BACK_GROUND_DEPTH + 20);
 
   pwm.writeMicroseconds(FR_abad, map(FR_leg.get_abad_angle(), 0, 180, 1000, 2200));
   pwm.writeMicroseconds(FR_hip, map(FR_leg.get_hip_angle(), 0, 180, 1000, 2200));
