@@ -46,13 +46,13 @@ const float L3 = 37.8;
 // const float GROUND_DEPTH = 180;
 
 const float STEP_LENGTH = 70;
-const float STEP_HEIGHT = 100;
+const float STEP_HEIGHT = 40;
 const float BACK_STEP_DEPTH = 1;
-const float SIDE_STEP_LENGTH = 30;
-const float SIDE_STEP_HEIGHT = 40;
+const float SIDE_STEP_LENGTH = 60;
+const float SIDE_STEP_HEIGHT = 50;
 const float SIDE_BACK_STEP_DEPTH = 5;
-const float FRONT_GROUND_DEPTH = 230;
-const float BACK_GROUND_DEPTH = 235;
+const float FRONT_GROUND_DEPTH = 200;
+const float BACK_GROUND_DEPTH = 205;
 
 // controller input variables
 char input_dir = 'S';
@@ -84,15 +84,15 @@ void setup()
   Serial.begin(9600);
 
   FR_leg.updateAngles(L3, 0, -FRONT_GROUND_DEPTH + 20);
-  FL_leg.updateAngles(L3, 0, -FRONT_GROUND_DEPTH + 20);
+  FL_leg.updateAngles(-L3, 0, -FRONT_GROUND_DEPTH + 20);
   BR_leg.updateAngles(L3, 0, -BACK_GROUND_DEPTH + 20);
-  BL_leg.updateAngles(L3, 0, -BACK_GROUND_DEPTH + 20);
+  BL_leg.updateAngles(-L3, 0, -BACK_GROUND_DEPTH + 20);
 
   pwm.writeMicroseconds(FR_abad, map(FR_leg.get_abad_angle(), 0, 180, 1000, 2200));
   pwm.writeMicroseconds(FR_hip, map(FR_leg.get_hip_angle(), 0, 180, 1000, 2200));
   pwm.writeMicroseconds(FR_knee, map(FR_leg.get_knee_angle(), 0, 180, 1000, 2200));
 
-  pwm.writeMicroseconds(FL_abad, map(FL_leg.get_abad_angle(), 0, 180, 1000, 2200));
+  pwm.writeMicroseconds(FL_abad, -map(FL_leg.get_abad_angle(), 0, 180, 1000, 2200));
   pwm.writeMicroseconds(FL_hip, map(FL_leg.get_hip_angle() - 10, 0, 180, 1000, 2200));
   pwm.writeMicroseconds(FL_knee, map(FL_leg.get_knee_angle(), 0, 180, 1000, 2200));
 
@@ -100,7 +100,7 @@ void setup()
   pwm.writeMicroseconds(BR_hip, map(BR_leg.get_hip_angle(), 0, 180, 1000, 2200));
   pwm.writeMicroseconds(BR_knee, map(BR_leg.get_knee_angle(), 0, 180, 1000, 2200));
 
-  pwm.writeMicroseconds(BL_abad, map(BL_leg.get_abad_angle(), 0, 180, 1000, 2200));
+  pwm.writeMicroseconds(BL_abad, -map(BL_leg.get_abad_angle(), 0, 180, 1000, 2200));
   pwm.writeMicroseconds(BL_hip, map(BL_leg.get_hip_angle() - 10, 0, 180, 1000, 2200));
   pwm.writeMicroseconds(BL_knee, map(BL_leg.get_knee_angle(), 0, 180, 1000, 2200));
 
@@ -170,9 +170,9 @@ void loop()
     BL_trajectory.interpolateNext(map(joystick_magnitude, 30, 127, 0, 100));
 
     FR_leg.updateAngles(FR_trajectory.get_x() + L3, FR_trajectory.get_y(), FR_trajectory.get_z() - FRONT_GROUND_DEPTH);
-    FL_leg.updateAngles(FL_trajectory.get_x() + L3, FL_trajectory.get_y(), FL_trajectory.get_z() - FRONT_GROUND_DEPTH);
+    FL_leg.updateAngles(FL_trajectory.get_x() - L3, FL_trajectory.get_y(), FL_trajectory.get_z() - FRONT_GROUND_DEPTH);
     BR_leg.updateAngles(BR_trajectory.get_x() + L3, BR_trajectory.get_y(), BR_trajectory.get_z() - BACK_GROUND_DEPTH);
-    BL_leg.updateAngles(BL_trajectory.get_x() + L3, BL_trajectory.get_y(), BL_trajectory.get_z() - BACK_GROUND_DEPTH);
+    BL_leg.updateAngles(BL_trajectory.get_x() - L3, BL_trajectory.get_y(), BL_trajectory.get_z() - BACK_GROUND_DEPTH);
 
     pwm.writeMicroseconds(FR_abad, map(FR_leg.get_abad_angle(), 0, 180, 1000, 2200));
     pwm.writeMicroseconds(FR_hip, map(FR_leg.get_hip_angle(), 0, 180, 1000, 2200));
