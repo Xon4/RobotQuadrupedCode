@@ -5,9 +5,9 @@
 #include "Leg.h"
 #include "Trajectory.h"
 #include <ps5Controller.h>
+#include <FastLED.h>
 
 // servo number declarations for the servo driver
-
 int FR_abad = 8;
 int FR_hip = 7;
 int FR_knee = 6;
@@ -23,6 +23,14 @@ int BR_knee = 9;
 int BL_abad = 5;
 int BL_hip = 4;
 int BL_knee = 3;
+
+// RGB LED declarations
+#define LED_PIN 2
+#define NUM_LEDS 40
+CRGBArray<NUM_LEDS> leds;
+
+// Speaker declarations
+int SPEAKER_PIN = 4;
 
 // speed var declaration
 int speed = 100;
@@ -82,6 +90,11 @@ void setup()
   pwm.setOscillatorFrequency(25000000);
   pwm.setPWMFreq(SERVO_FREQ);
   Serial.begin(9600);
+
+  FastLED.addLeds<WS2812, LED_PIN, GRB>(leds, NUM_LEDS);
+
+  pinMode(SPEAKER_PIN, OUTPUT);
+  digitalWrite(SPEAKER_PIN, LOW);
 
   FR_leg.updateAngles(L3, 0, -FRONT_GROUND_DEPTH + 20);
   FL_leg.updateAngles(-L3, 0, -FRONT_GROUND_DEPTH + 20);
@@ -149,6 +162,13 @@ void loop()
   {
     joystick_magnitude = 0;
     input_dir = 'S';
+  }
+
+  if (ps5.Square())
+  {
+    digitalWrite(SPEAKER_PIN, HIGH);
+    delay(100);
+    digitalWrite(SPEAKER_PIN, LOW);
   }
   // Serial.print(FL_trajectory.getDir());
   // Serial.print(", ");
