@@ -18,6 +18,8 @@ private:
   bool swing;
   int leg;
   char dir;
+  float body_length;
+  float body_width;
 
 public:
   Trajectory(float step_length_init, float step_height_init, float back_step_depth_init, float side_step_length_init, float side_step_height_init, float side_back_step_height_init, int leg_init);
@@ -28,6 +30,8 @@ public:
   float get_x();
   float get_y();
   float get_z();
+  void orientControl(float orient[3]);
+  void posControl(float pos[3]);
 };
 
 #endif

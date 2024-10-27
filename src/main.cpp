@@ -49,7 +49,7 @@ const float STEP_LENGTH = 70;
 const float STEP_HEIGHT = 40;
 const float BACK_STEP_DEPTH = 1;
 const float SIDE_STEP_LENGTH = 60;
-const float SIDE_STEP_HEIGHT = 50;
+const float SIDE_STEP_HEIGHT = 40;
 const float SIDE_BACK_STEP_DEPTH = 5;
 const float FRONT_GROUND_DEPTH = 200;
 const float BACK_GROUND_DEPTH = 205;
@@ -57,6 +57,7 @@ const float BACK_GROUND_DEPTH = 205;
 // controller input variables
 char input_dir = 'S';
 float joystick_magnitude = 0;
+bool prev_R2_input = false;
 
 // declare class instances
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
@@ -90,7 +91,7 @@ void setup()
 
   pwm.writeMicroseconds(FR_abad, map(FR_leg.get_abad_angle(), 0, 180, 1000, 2200));
   pwm.writeMicroseconds(FR_hip, map(FR_leg.get_hip_angle(), 0, 180, 1000, 2200));
-  pwm.writeMicroseconds(FR_knee, map(FR_leg.get_knee_angle(), 0, 180, 1000, 2200));
+  pwm.writeMicroseconds(FR_knee, map(FR_leg.get_knee_angle() - 3, 0, 180, 1000, 2200));
 
   pwm.writeMicroseconds(FL_abad, -map(FL_leg.get_abad_angle(), 0, 180, 1000, 2200));
   pwm.writeMicroseconds(FL_hip, map(FL_leg.get_hip_angle() - 10, 0, 180, 1000, 2200));
@@ -98,7 +99,7 @@ void setup()
 
   pwm.writeMicroseconds(BR_abad, map(BR_leg.get_abad_angle() - 5, 0, 180, 1000, 2200));
   pwm.writeMicroseconds(BR_hip, map(BR_leg.get_hip_angle(), 0, 180, 1000, 2200));
-  pwm.writeMicroseconds(BR_knee, map(BR_leg.get_knee_angle(), 0, 180, 1000, 2200));
+  pwm.writeMicroseconds(BR_knee, map(BR_leg.get_knee_angle() - 5, 0, 180, 1000, 2200));
 
   pwm.writeMicroseconds(BL_abad, -map(BL_leg.get_abad_angle(), 0, 180, 1000, 2200));
   pwm.writeMicroseconds(BL_hip, map(BL_leg.get_hip_angle() - 10, 0, 180, 1000, 2200));
@@ -154,20 +155,64 @@ void loop()
   // Serial.print(", ");
   // Serial.println(BL_trajectory.getDir());
 
-  if (BL_trajectory.getDir() != input_dir)
+  if (fabs(current_time - prev_time) >= millis_delay)
   {
-    FR_trajectory.setDir(input_dir);
-    FL_trajectory.setDir(input_dir);
-    BR_trajectory.setDir(input_dir);
-    BL_trajectory.setDir(input_dir);
-  }
+    if (ps5.R2()) // orientation & position control mode
+    {
+      millis_delay = 1;
+      if (abs(ps5.RStickX()) > 5 || abs(ps5.RStickY()) > 5) // tolerances to account for slight joystick offsets
+      {
+        float orient[3] = {0, -float(map(ps5.RStickY(), -127, 127, -100, 100)), -float(map(ps5.RStickX(), -127, 127, -100, 100))};
+        FR_trajectory.orientControl(orient);
+        FL_trajectory.orientControl(orient);
+        BR_trajectory.orientControl(orient);
+        BL_trajectory.orientControl(orient);
+      }
+      else if (abs(ps5.LStickX()) > 5 || abs(ps5.LStickY()) > 5)
+      {
+        float pos[3] = {float(map(ps5.LStickX(), -127, 127, -100, 100)), float(map(ps5.LStickY(), -127, 127, -100, 100)), 0};
+        FR_trajectory.posControl(pos);
+        FL_trajectory.posControl(pos);
+        BR_trajectory.posControl(pos);
+        BL_trajectory.posControl(pos);
+      }
+    }
+    else if (ps5.L2())
+    {
+      millis_delay = 1;
+      if (abs(ps5.RStickX()) > 5) // tolerances to account for slight joystick offsets
+      {
+        float orient[3] = {float(map(ps5.RStickX(), -127, 127, -100, 100)), 0, 0};
+        FR_trajectory.orientControl(orient);
+        FL_trajectory.orientControl(orient);
+        BR_trajectory.orientControl(orient);
+        BL_trajectory.orientControl(orient);
+      }
+      else if (abs(ps5.LStickY()) > 5)
+      {
+        float pos[3] = {0, 0, float(map(ps5.LStickY(), -127, 127, -100, 100))};
+        FR_trajectory.posControl(pos);
+        FL_trajectory.posControl(pos);
+        BR_trajectory.posControl(pos);
+        BL_trajectory.posControl(pos);
+      }
+    }
+    else // trot gait mode
+    {
+      if (BL_trajectory.getDir() != input_dir)
+      {
+        FR_trajectory.setDir(input_dir);
+        FL_trajectory.setDir(input_dir);
+        BR_trajectory.setDir(input_dir);
+        BL_trajectory.setDir(input_dir);
+      }
 
-  if (fabs(current_time - prev_time) >= 10)
-  {
-    FR_trajectory.interpolateNext(map(joystick_magnitude, 30, 127, 0, 100));
-    FL_trajectory.interpolateNext(map(joystick_magnitude, 30, 127, 0, 100));
-    BR_trajectory.interpolateNext(map(joystick_magnitude, 30, 127, 0, 100));
-    BL_trajectory.interpolateNext(map(joystick_magnitude, 30, 127, 0, 100));
+      millis_delay = 10;
+      FR_trajectory.interpolateNext(map(joystick_magnitude, 30, 127, 0, 100));
+      FL_trajectory.interpolateNext(map(joystick_magnitude, 30, 127, 0, 100));
+      BR_trajectory.interpolateNext(map(joystick_magnitude, 30, 127, 0, 100));
+      BL_trajectory.interpolateNext(map(joystick_magnitude, 30, 127, 0, 100));
+    }
 
     FR_leg.updateAngles(FR_trajectory.get_x() + L3, FR_trajectory.get_y(), FR_trajectory.get_z() - FRONT_GROUND_DEPTH);
     FL_leg.updateAngles(FL_trajectory.get_x() - L3, FL_trajectory.get_y(), FL_trajectory.get_z() - FRONT_GROUND_DEPTH);
@@ -176,7 +221,7 @@ void loop()
 
     pwm.writeMicroseconds(FR_abad, map(FR_leg.get_abad_angle(), 0, 180, 1000, 2200));
     pwm.writeMicroseconds(FR_hip, map(FR_leg.get_hip_angle(), 0, 180, 1000, 2200));
-    pwm.writeMicroseconds(FR_knee, map(FR_leg.get_knee_angle(), 0, 180, 1000, 2200));
+    pwm.writeMicroseconds(FR_knee, map(FR_leg.get_knee_angle() - 3, 0, 180, 1000, 2200));
 
     pwm.writeMicroseconds(FL_abad, map(FL_leg.get_abad_angle(), 0, 180, 1000, 2200));
     pwm.writeMicroseconds(FL_hip, map(FL_leg.get_hip_angle() - 10, 0, 180, 1000, 2200));
@@ -184,7 +229,7 @@ void loop()
 
     pwm.writeMicroseconds(BR_abad, map(BR_leg.get_abad_angle() - 5, 0, 180, 1000, 2200));
     pwm.writeMicroseconds(BR_hip, map(BR_leg.get_hip_angle(), 0, 180, 1000, 2200));
-    pwm.writeMicroseconds(BR_knee, map(BR_leg.get_knee_angle(), 0, 180, 1000, 2200));
+    pwm.writeMicroseconds(BR_knee, map(BR_leg.get_knee_angle() - 5, 0, 180, 1000, 2200));
 
     pwm.writeMicroseconds(BL_abad, map(BL_leg.get_abad_angle(), 0, 180, 1000, 2200));
     pwm.writeMicroseconds(BL_hip, map(BL_leg.get_hip_angle() - 10, 0, 180, 1000, 2200));
