@@ -5,9 +5,9 @@
 #include "Leg.h"
 #include "Trajectory.h"
 #include <ps5Controller.h>
+#include <FastLED.h>
 
 // servo number declarations for the servo driver
-
 int FR_abad = 8;
 int FR_hip = 7;
 int FR_knee = 6;
@@ -23,6 +23,16 @@ int BR_knee = 9;
 int BL_abad = 5;
 int BL_hip = 4;
 int BL_knee = 3;
+
+// RGB LED declarations
+#define LED_PIN 2
+#define NUM_LEDS 40
+CRGBArray<NUM_LEDS> leds;
+int RGBval = 0;
+int t = 0;
+
+// Speaker declarations
+int SPEAKER_PIN = 4;
 
 // speed var declaration
 int speed = 100;
@@ -84,6 +94,14 @@ void setup()
   pwm.setPWMFreq(SERVO_FREQ);
   Serial.begin(9600);
 
+  FastLED.addLeds<WS2812, LED_PIN, GRB>(leds, NUM_LEDS);
+  leds[0] = CRGB(0, 0, 0);
+  leds[1] = CRGB(0, 0, 0);
+  FastLED.show();
+
+  pinMode(SPEAKER_PIN, OUTPUT);
+  digitalWrite(SPEAKER_PIN, LOW);
+
   FR_leg.updateAngles(L3, 0, -FRONT_GROUND_DEPTH + 20);
   FL_leg.updateAngles(-L3, 0, -FRONT_GROUND_DEPTH + 20);
   BR_leg.updateAngles(L3, 0, -BACK_GROUND_DEPTH + 20);
@@ -113,7 +131,14 @@ void loop()
   current_time = millis();
   while (ps5.isConnected() == false)
   {
-    Serial.println("not connected");
+    if (fabs(current_time - prev_time) >= 4)
+    {
+      RGBval = 255 / 2.0 * sin(t) + 255 / 2.0;
+      leds[0] = CRGB(RGBval, RGBval, RGBval);
+      leds[1] = CRGB(RGBval, RGBval, RGBval);
+      FastLED.show();
+      t++;
+    }
   }
 
   if (ps5.RStickX() > 30)
@@ -151,6 +176,13 @@ void loop()
     joystick_magnitude = 0;
     input_dir = 'S';
   }
+
+  if (ps5.Square())
+  {
+    digitalWrite(SPEAKER_PIN, HIGH);
+    delay(100);
+    digitalWrite(SPEAKER_PIN, LOW);
+  }
   // Serial.print(FL_trajectory.getDir());
   // Serial.print(", ");
   // Serial.println(BL_trajectory.getDir());
@@ -159,6 +191,9 @@ void loop()
   {
     if (ps5.R2()) // orientation & position control mode
     {
+      leds[0] = CRGB(52, 235, 85);
+      leds[1] = CRGB(52, 235, 85);
+
       millis_delay = 1;
       if (abs(ps5.RStickX()) > 5 || abs(ps5.RStickY()) > 5) // tolerances to account for slight joystick offsets
       {
@@ -179,6 +214,9 @@ void loop()
     }
     else if (ps5.L2())
     {
+      leds[0] = CRGB(52, 235, 85);
+      leds[1] = CRGB(52, 235, 85);
+
       millis_delay = 1;
       if (abs(ps5.RStickX()) > 5) // tolerances to account for slight joystick offsets
       {
@@ -199,6 +237,9 @@ void loop()
     }
     else // trot gait mode
     {
+      leds[0] = CRGB(255, 255, 255);
+      leds[1] = CRGB(255, 255, 255);
+
       if (BL_trajectory.getDir() != input_dir)
       {
         FR_trajectory.setDir(input_dir);
@@ -206,13 +247,14 @@ void loop()
         BR_trajectory.setDir(input_dir);
         BL_trajectory.setDir(input_dir);
       }
-
       millis_delay = 10;
+
       FR_trajectory.interpolateNext(map(joystick_magnitude, 30, 127, 0, 100));
       FL_trajectory.interpolateNext(map(joystick_magnitude, 30, 127, 0, 100));
       BR_trajectory.interpolateNext(map(joystick_magnitude, 30, 127, 0, 100));
       BL_trajectory.interpolateNext(map(joystick_magnitude, 30, 127, 0, 100));
     }
+    FastLED.show();
 
     FR_leg.updateAngles(FR_trajectory.get_x() + L3, FR_trajectory.get_y(), FR_trajectory.get_z() - FRONT_GROUND_DEPTH);
     FL_leg.updateAngles(FL_trajectory.get_x() - L3, FL_trajectory.get_y(), FL_trajectory.get_z() - FRONT_GROUND_DEPTH);
