@@ -28,6 +28,8 @@ int BL_knee = 3;
 #define LED_PIN 2
 #define NUM_LEDS 40
 CRGBArray<NUM_LEDS> leds;
+int RGBval = 0;
+int t = 0;
 
 // Speaker declarations
 int SPEAKER_PIN = 4;
@@ -92,6 +94,9 @@ void setup()
   Serial.begin(9600);
 
   FastLED.addLeds<WS2812, LED_PIN, GRB>(leds, NUM_LEDS);
+  leds[0] = CRGB(0, 0, 0);
+  leds[1] = CRGB(0, 0, 0);
+  FastLED.show();
 
   pinMode(SPEAKER_PIN, OUTPUT);
   digitalWrite(SPEAKER_PIN, LOW);
@@ -125,7 +130,14 @@ void loop()
   current_time = millis();
   while (ps5.isConnected() == false)
   {
-    Serial.println("not connected");
+    if (fabs(current_time - prev_time) >= 4)
+    {
+      RGBval = 255 / 2.0 * sin(t) + 255 / 2.0;
+      leds[0] = CRGB(RGBval, RGBval, RGBval);
+      leds[1] = CRGB(RGBval, RGBval, RGBval);
+      FastLED.show();
+      t++;
+    }
   }
 
   if (ps5.RStickX() > 30)
@@ -184,6 +196,15 @@ void loop()
 
   if (fabs(current_time - prev_time) >= 10)
   {
+    RGBval += 2;
+    if (RGBval >= 255)
+    {
+      RGBval = 255;
+    }
+    leds[0] = CRGB(RGBval, RGBval, RGBval);
+    leds[1] = CRGB(RGBval, RGBval, RGBval);
+    FastLED.show();
+
     FR_trajectory.interpolateNext(map(joystick_magnitude, 30, 127, 0, 100));
     FL_trajectory.interpolateNext(map(joystick_magnitude, 30, 127, 0, 100));
     BR_trajectory.interpolateNext(map(joystick_magnitude, 30, 127, 0, 100));
