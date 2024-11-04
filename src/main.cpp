@@ -128,12 +128,13 @@ void setup()
 
 void loop()
 {
+  
   current_time = millis();
   while (ps5.isConnected() == false)
   {
     if (fabs(current_time - prev_time) >= 4)
     {
-      RGBval = 255 / 2.0 * sin(t) + 255 / 2.0;
+      RGBval = 255 / 2.0 * sin(0.01*t) + 255 / 2.0;
       leds[0] = CRGB(RGBval, RGBval, RGBval);
       leds[1] = CRGB(RGBval, RGBval, RGBval);
       FastLED.show();
@@ -177,10 +178,11 @@ void loop()
     input_dir = 'S';
   }
 
+  
   if (ps5.Square())
   {
     digitalWrite(SPEAKER_PIN, HIGH);
-    delay(100);
+    delay(10);
     digitalWrite(SPEAKER_PIN, LOW);
   }
   // Serial.print(FL_trajectory.getDir());
