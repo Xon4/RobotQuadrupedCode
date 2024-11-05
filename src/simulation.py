@@ -331,21 +331,21 @@ class Trajectory:
         if alpha < 0:
             d *= -1
         if self.leg == "FR":
-            self.x = d*math.cos(alpha/2)
-            self.y = -d*math.sin(alpha/2)
-            self.z = -GROUND_DEPTH + 50*math.sin(math.pi/24 * orient[0]/100.0) + 150*math.sin(math.pi/24 * orient[1]/100.0)
+            self.x = d*math.cos(alpha/2) 
+            self.y = -d*math.sin(alpha/2) + (300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0*math.cos(math.pi/24 * orient[1]/100.0) - (300/2.0*math.sin(math.pi/24 * orient[1]/100.0) + GROUND_DEPTH) * math.sin(math.pi/24 * orient[1]/100.0)
+            self.z = -(300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0*math.sin(math.pi/24 * orient[1]/100.0) - (300/2.0*math.sin(math.pi/24 * orient[1]/100.0) + GROUND_DEPTH) * math.cos(math.pi/24 * orient[1]/100.0)
         elif self.leg == "FL":
             self.x = d*math.cos(alpha/2)
-            self.y = -d*math.sin(alpha/2)
-            self.z = -GROUND_DEPTH - 50*math.sin(math.pi/24 * orient[0]/100.0) + 150*math.sin(math.pi/24 * orient[1]/100.0)
+            self.y = -d*math.sin(alpha/2) + (300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0*math.cos(math.pi/24 * orient[1]/100.0) - (300/2.0*math.sin(math.pi/24 * orient[1]/100.0) + GROUND_DEPTH) * math.sin(math.pi/24 * orient[1]/100.0)
+            self.z = -(300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0*math.sin(math.pi/24 * orient[1]/100.0) -(300/2.0*math.sin(math.pi/24 * orient[1]/100.0) + GROUND_DEPTH) * math.cos(math.pi/24 * orient[1]/100.0)
         elif self.leg == "BR":
             self.x = -d*math.cos(alpha/2)
-            self.y = d*math.sin(alpha/2)
-            self.z = -GROUND_DEPTH + 50*math.sin(math.pi/24 * orient[0]/100.0) - 150*math.sin(math.pi/24 * orient[1]/100.0)
+            self.y = d*math.sin(alpha/2) - (300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0 * math.cos(math.pi/24 * orient[1]/100.0) - (GROUND_DEPTH - 300/2.0*math.sin(math.pi/24 * orient[1]/100.0))*math.sin(math.pi/24 * orient[1]/100.0)
+            self.z = (300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0 * math.sin(math.pi/24 * orient[1]/100.0) - (GROUND_DEPTH - 300/2.0 * math.sin(math.pi/24 * orient[1]/100.0)) * math.cos(math.pi/24 * orient[1]/100.0)
         elif self.leg == "BL":
             self.x = -d*math.cos(alpha/2)
-            self.y = d*math.sin(alpha/2)
-            self.z = -GROUND_DEPTH - 50*math.sin(math.pi/24 * orient[0]/100.0) - 150*math.sin(math.pi/24 * orient[1]/100.0)
+            self.y = d*math.sin(alpha/2) - (300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0 * math.cos(math.pi/24 * orient[1]/100.0) - (GROUND_DEPTH - 300/2.0*math.sin(math.pi/24 * orient[1]/100.0))*math.sin(math.pi/24 * orient[1]/100.0)
+            self.z = (300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0 * math.sin(math.pi/24 * orient[1]/100.0) - (GROUND_DEPTH - 300/2.0 * math.sin(math.pi/24 * orient[1]/100.0)) * math.cos(math.pi/24 * orient[1]/100.0)
 
     def getX(self):
         return self.x
@@ -374,13 +374,13 @@ def solveIK(targetPos, abadPos):
 
 def translateTrajectory(pos, leg):
     if leg == "FR":
-        return [pos[0]+FR_abadPos[0]+50, pos[1]+FR_abadPos[1]-STEP_LENGTH/2, pos[2]]
+        return [pos[0]+FR_abadPos[0]+50, pos[1]+FR_abadPos[1], pos[2]]
     elif leg == "FL":
-        return [pos[0]+FL_abadPos[0]-50, pos[1]+FL_abadPos[1]-STEP_LENGTH/2, pos[2]]
+        return [pos[0]+FL_abadPos[0]-50, pos[1]+FL_abadPos[1], pos[2]]
     elif leg == "BR":
-        return [pos[0]+BR_abadPos[0]+50, pos[1]+BR_abadPos[1]-STEP_LENGTH/2, pos[2]]
+        return [pos[0]+BR_abadPos[0]+50, pos[1]+BR_abadPos[1], pos[2]]
     elif leg == "BL":
-        return [pos[0]+BL_abadPos[0]-50, pos[1]+BL_abadPos[1]-STEP_LENGTH/2, pos[2]]
+        return [pos[0]+BL_abadPos[0]-50, pos[1]+BL_abadPos[1], pos[2]]
     return
 
 def drawLegs():
@@ -390,7 +390,7 @@ def drawLegs():
     BR_footPos = translateTrajectory([BR_trajectory.getX(), BR_trajectory.getY(), BR_trajectory.getZ()], "BR")
     BL_footPos = translateTrajectory([BL_trajectory.getX(), BL_trajectory.getY(), BL_trajectory.getZ()], "BL")
     
-    print(FR_footPos)
+    #print(np.linalg.norm(np.array(FR_footPos) - np.array(BR_footPos)))
     
     #draw feet as points
     ax.scatter(FR_footPos[0], FR_footPos[1], FR_footPos[2], color='black', s=100, label='Point')
@@ -469,35 +469,35 @@ def animate(frame):
    
     
     
-    newKey = keyboard.get_hotkey_name()
+    # newKey = keyboard.get_hotkey_name()
 
-    if newKey == "up":
-        dirState = "forward"
-    elif newKey == "down":
-        dirState = "backward"
-    elif newKey == "right":
-        dirState = "right_turn"
-    elif newKey == "left":
-        dirState = "left_turn"
-    elif newKey == "":
-        dirState = "still"
+    # if newKey == "up":
+    #     dirState = "forward"
+    # elif newKey == "down":
+    #     dirState = "backward"
+    # elif newKey == "right":
+    #     dirState = "right_turn"
+    # elif newKey == "left":
+    #     dirState = "left_turn"
+    # elif newKey == "":
+    #     dirState = "still"
     
-    if FR_trajectory.getDir() != dirState:
-        FR_trajectory.setDir(dirState)
-        FL_trajectory.setDir(dirState)
-        BR_trajectory.setDir(dirState)
-        BL_trajectory.setDir(dirState)
+    # if FR_trajectory.getDir() != dirState:
+    #     FR_trajectory.setDir(dirState)
+    #     FL_trajectory.setDir(dirState)
+    #     BR_trajectory.setDir(dirState)
+    #     BL_trajectory.setDir(dirState)
        
-    FR_trajectory.interpolate(gaitSpeed)
-    FL_trajectory.interpolate(gaitSpeed)
-    BR_trajectory.interpolate(gaitSpeed)
-    BL_trajectory.interpolate(gaitSpeed)
+    # FR_trajectory.interpolate(gaitSpeed)
+    # FL_trajectory.interpolate(gaitSpeed)
+    # BR_trajectory.interpolate(gaitSpeed)
+    # BL_trajectory.interpolate(gaitSpeed)
     
 
-    # FR_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
-    # FL_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
-    # BR_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
-    # BL_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
+    FR_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
+    FL_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
+    BR_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
+    BL_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
     
     
 
@@ -519,13 +519,13 @@ ani = animation.FuncAnimation(fig, animate, frames=200, interval=50)
 axSlider = plt.axes([0.25, 0, 0.65, 0.03], facecolor='lightgoldenrodyellow')
 speedSlider = Slider(axSlider, 'Gait Speed', 0, 100, valinit=GAIT_SPEED)
 
-# rollAxSlider = plt.axes([0.25, 0.1, 0.65, 0.03], facecolor='lightgoldenrodyellow')
-# pitchAxSlider = plt.axes([0.25, 0.05, 0.65, 0.03], facecolor='lightgoldenrodyellow')
-# yawAxSlider = plt.axes([0.25, 0, 0.65, 0.03], facecolor='lightgoldenrodyellow')
+rollAxSlider = plt.axes([0.25, 0.1, 0.65, 0.03], facecolor='lightgoldenrodyellow')
+pitchAxSlider = plt.axes([0.25, 0.05, 0.65, 0.03], facecolor='lightgoldenrodyellow')
+yawAxSlider = plt.axes([0.25, 0, 0.65, 0.03], facecolor='lightgoldenrodyellow')
 
-# rollSlider = Slider(rollAxSlider, 'rollPos', -100, 100, valinit=0)
-# pitchSlider = Slider(pitchAxSlider, 'pitchPos', -100, 100, valinit=0)
-# yawSlider = Slider(yawAxSlider, 'yawPos', -100, 100, valinit=0)
+rollSlider = Slider(rollAxSlider, 'rollPos', -100, 100, valinit=0)
+pitchSlider = Slider(pitchAxSlider, 'pitchPos', -100, 100, valinit=0)
+yawSlider = Slider(yawAxSlider, 'yawPos', -100, 100, valinit=0)
 
 # Show the plot
 plt.show()

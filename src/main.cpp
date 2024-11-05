@@ -255,6 +255,11 @@ void loop()
       FL_trajectory.interpolateNext(map(joystick_magnitude, 30, 127, 0, 100));
       BR_trajectory.interpolateNext(map(joystick_magnitude, 30, 127, 0, 100));
       BL_trajectory.interpolateNext(map(joystick_magnitude, 30, 127, 0, 100));
+
+      FR_leg.updateAngles(FR_trajectory.get_x() + L3, FR_trajectory.get_y(), FR_trajectory.get_z() - FRONT_GROUND_DEPTH);
+      FL_leg.updateAngles(FL_trajectory.get_x() - L3, FL_trajectory.get_y(), FL_trajectory.get_z() - FRONT_GROUND_DEPTH);
+      BR_leg.updateAngles(BR_trajectory.get_x() + L3, BR_trajectory.get_y(), BR_trajectory.get_z() - BACK_GROUND_DEPTH);
+      BL_leg.updateAngles(BL_trajectory.get_x() - L3, BL_trajectory.get_y(), BL_trajectory.get_z() - BACK_GROUND_DEPTH);
     }
     FastLED.show();
 
