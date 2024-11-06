@@ -331,21 +331,34 @@ class Trajectory:
         if alpha < 0:
             d *= -1
         if self.leg == "FR":
-            self.x = d*math.cos(alpha/2) 
-            self.y = -d*math.sin(alpha/2) + (300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0*math.cos(math.pi/24 * orient[1]/100.0) - (300/2.0*math.sin(math.pi/24 * orient[1]/100.0) + GROUND_DEPTH) * math.sin(math.pi/24 * orient[1]/100.0)
-            self.z = -(300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0*math.sin(math.pi/24 * orient[1]/100.0) - (300/2.0*math.sin(math.pi/24 * orient[1]/100.0) + GROUND_DEPTH) * math.cos(math.pi/24 * orient[1]/100.0)
+            # self.x = d*math.cos(alpha/2)
+            # self.y = -d*math.sin(alpha/2) + (300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0*math.cos(math.pi/24 * orient[1]/100.0) - (300/2.0*math.sin(math.pi/24 * orient[1]/100.0) + GROUND_DEPTH) * math.sin(math.pi/24 * orient[1]/100.0)
+            # self.z = -(300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0*math.sin(math.pi/24 * orient[1]/100.0) - (300/2.0*math.sin(math.pi/24 * orient[1]/100.0) + GROUND_DEPTH) * math.cos(math.pi/24 * orient[1]/100.0) 
+            self.x = (50+(100-100*math.cos(math.pi/24 * orient[0]/100.0))/2.0)*math.cos(math.pi/24 * orient[0]/100.0) - (100/2.0 * math.sin(math.pi/24 * orient[0]/100.0) + GROUND_DEPTH)*math.sin(math.pi/24 * orient[0]/100.0)
+            self.y = 0
+            self.z = -(50+(100-100*math.cos(math.pi/24 * orient[0]/100.0))/2.0) * math.sin(math.pi/24 * orient[0]/100.0) - (100/2.0 * math.sin(math.pi/24 * orient[0]/100.0) + GROUND_DEPTH) * math.cos(math.pi/24 * orient[0]/100.0)
         elif self.leg == "FL":
-            self.x = d*math.cos(alpha/2)
-            self.y = -d*math.sin(alpha/2) + (300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0*math.cos(math.pi/24 * orient[1]/100.0) - (300/2.0*math.sin(math.pi/24 * orient[1]/100.0) + GROUND_DEPTH) * math.sin(math.pi/24 * orient[1]/100.0)
-            self.z = -(300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0*math.sin(math.pi/24 * orient[1]/100.0) -(300/2.0*math.sin(math.pi/24 * orient[1]/100.0) + GROUND_DEPTH) * math.cos(math.pi/24 * orient[1]/100.0)
+            # self.x = d*math.cos(alpha/2) 
+            # self.y = -d*math.sin(alpha/2) + (300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0*math.cos(math.pi/24 * orient[1]/100.0) - (300/2.0*math.sin(math.pi/24 * orient[1]/100.0) + GROUND_DEPTH) * math.sin(math.pi/24 * orient[1]/100.0)
+            # self.z = -(300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0*math.sin(math.pi/24 * orient[1]/100.0) - (300/2.0*math.sin(math.pi/24 * orient[1]/100.0) + GROUND_DEPTH) * math.cos(math.pi/24 * orient[1]/100.0) 
+            self.x = -(50+(100-100*math.cos(math.pi/24 * orient[0]/100.0))/2.0)*math.cos(math.pi/24 * orient[0]/100.0) - (GROUND_DEPTH - 100/2.0 * math.sin(math.pi/24 * orient[0]/100.0))*math.sin(math.pi/24 * orient[0]/100.0)
+            self.y = 0
+            self.z = (50+(100-100*math.cos(math.pi/24 * orient[0]/100.0))/2.0) * math.sin(math.pi/24 * orient[0]/100.0) - (GROUND_DEPTH - 100/2.0 * math.sin(math.pi/24 * orient[0]/100.0)) * math.cos(math.pi/24 * orient[0]/100.0)
         elif self.leg == "BR":
-            self.x = -d*math.cos(alpha/2)
-            self.y = d*math.sin(alpha/2) - (300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0 * math.cos(math.pi/24 * orient[1]/100.0) - (GROUND_DEPTH - 300/2.0*math.sin(math.pi/24 * orient[1]/100.0))*math.sin(math.pi/24 * orient[1]/100.0)
-            self.z = (300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0 * math.sin(math.pi/24 * orient[1]/100.0) - (GROUND_DEPTH - 300/2.0 * math.sin(math.pi/24 * orient[1]/100.0)) * math.cos(math.pi/24 * orient[1]/100.0)
+            # self.x = -d*math.cos(alpha/2)
+            # self.y = d*math.sin(alpha/2) - (300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0 * math.cos(math.pi/24 * orient[1]/100.0) - (GROUND_DEPTH - 300/2.0*math.sin(math.pi/24 * orient[1]/100.0))*math.sin(math.pi/24 * orient[1]/100.0)
+            # self.z = (300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0 * math.sin(math.pi/24 * orient[1]/100.0) - (GROUND_DEPTH - 300/2.0 * math.sin(math.pi/24 * orient[1]/100.0)) * math.cos(math.pi/24 * orient[1]/100.0) 
+            self.x = (50+(100-100*math.cos(math.pi/24 * orient[0]/100.0))/2.0)*math.cos(math.pi/24 * orient[0]/100.0) - (100/2.0 * math.sin(math.pi/24 * orient[0]/100.0) + GROUND_DEPTH)*math.sin(math.pi/24 * orient[0]/100.0)
+            self.y = 0
+            self.z = -(50+(100-100*math.cos(math.pi/24 * orient[0]/100.0))/2.0) * math.sin(math.pi/24 * orient[0]/100.0) - (100/2.0 * math.sin(math.pi/24 * orient[0]/100.0) + GROUND_DEPTH) * math.cos(math.pi/24 * orient[0]/100.0)
         elif self.leg == "BL":
-            self.x = -d*math.cos(alpha/2)
-            self.y = d*math.sin(alpha/2) - (300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0 * math.cos(math.pi/24 * orient[1]/100.0) - (GROUND_DEPTH - 300/2.0*math.sin(math.pi/24 * orient[1]/100.0))*math.sin(math.pi/24 * orient[1]/100.0)
-            self.z = (300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0 * math.sin(math.pi/24 * orient[1]/100.0) - (GROUND_DEPTH - 300/2.0 * math.sin(math.pi/24 * orient[1]/100.0)) * math.cos(math.pi/24 * orient[1]/100.0)
+            # self.x = -d*math.cos(alpha/2) 
+            # self.y = d*math.sin(alpha/2) - (300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0 * math.cos(math.pi/24 * orient[1]/100.0) - (GROUND_DEPTH - 300/2.0*math.sin(math.pi/24 * orient[1]/100.0))*math.sin(math.pi/24 * orient[1]/100.0)
+            # self.z = (300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0 * math.sin(math.pi/24 * orient[1]/100.0) - (GROUND_DEPTH - 300/2.0 * math.sin(math.pi/24 * orient[1]/100.0)) * math.cos(math.pi/24 * orient[1]/100.0) 
+            self.x = -(50+(100-100*math.cos(math.pi/24 * orient[0]/100.0))/2.0)*math.cos(math.pi/24 * orient[0]/100.0) - (100/2.0 * math.sin(math.pi/24 * orient[0]/100.0) + GROUND_DEPTH)*math.sin(math.pi/24 * orient[0]/100.0)
+            self.y = 0
+            self.z = (50+(100-100*math.cos(math.pi/24 * orient[0]/100.0))/2.0) * math.sin(math.pi/24 * orient[0]/100.0) - (GROUND_DEPTH - 100/2.0 * math.sin(math.pi/24 * orient[0]/100.0)) * math.cos(math.pi/24 * orient[0]/100.0)
+
 
     def getX(self):
         return self.x
@@ -385,12 +398,19 @@ def translateTrajectory(pos, leg):
 
 def drawLegs():
     #end effector positions
-    FR_footPos = translateTrajectory([FR_trajectory.getX(), FR_trajectory.getY(), FR_trajectory.getZ()], "FR")
-    FL_footPos = translateTrajectory([FL_trajectory.getX(), FL_trajectory.getY(), FL_trajectory.getZ()], "FL")
-    BR_footPos = translateTrajectory([BR_trajectory.getX(), BR_trajectory.getY(), BR_trajectory.getZ()], "BR")
-    BL_footPos = translateTrajectory([BL_trajectory.getX(), BL_trajectory.getY(), BL_trajectory.getZ()], "BL")
+    # comment/uncomment below if doing gait control
+    # FR_footPos = translateTrajectory([FR_trajectory.getX(), FR_trajectory.getY(), FR_trajectory.getZ()], "FR")
+    # FL_footPos = translateTrajectory([FL_trajectory.getX(), FL_trajectory.getY(), FL_trajectory.getZ()], "FL")
+    # BR_footPos = translateTrajectory([BR_trajectory.getX(), BR_trajectory.getY(), BR_trajectory.getZ()], "BR")
+    # BL_footPos = translateTrajectory([BL_trajectory.getX(), BL_trajectory.getY(), BL_trajectory.getZ()], "BL")
     
-    #print(np.linalg.norm(np.array(FR_footPos) - np.array(BR_footPos)))
+    # comment/uncomment below if doing orientation control
+    FR_footPos = [FR_trajectory.getX() + FR_abadPos[0], FR_trajectory.getY() + FR_abadPos[1], FR_trajectory.getZ()]
+    FL_footPos = [FL_trajectory.getX() + FL_abadPos[0], FL_trajectory.getY() + FL_abadPos[1], FL_trajectory.getZ()]
+    BR_footPos = [BR_trajectory.getX() + BR_abadPos[0], BR_trajectory.getY() + BR_abadPos[1], BR_trajectory.getZ()]
+    BL_footPos = [BL_trajectory.getX() + BL_abadPos[0], BL_trajectory.getY() + BL_abadPos[1], BL_trajectory.getZ()]
+    
+    print(np.linalg.norm(np.array(FR_footPos) - np.array(FL_footPos)))
     
     #draw feet as points
     ax.scatter(FR_footPos[0], FR_footPos[1], FR_footPos[2], color='black', s=100, label='Point')
