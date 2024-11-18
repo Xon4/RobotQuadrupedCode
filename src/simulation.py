@@ -18,10 +18,14 @@ SIDE_BACK_STEP_DEPTH = 2
 GAIT_SPEED = 80
 GROUND_DEPTH = 200
 
-FR_abadPos = [50, 150, 0]
-FL_abadPos = [-50, 150, 0]
-BR_abadPos = [50, -150, 0]
-BL_abadPos = [-50, -150, 0]
+BODY_WIDTH = 100
+BODY_LENGTH = 300
+ABAD_LENGTH = 50
+
+FR_abadPos = [BODY_WIDTH/2.0, BODY_LENGTH/2.0, 0]
+FL_abadPos = [-BODY_WIDTH/2.0, BODY_LENGTH/2.0, 0]
+BR_abadPos = [BODY_WIDTH/2.0, -BODY_LENGTH/2.0, 0]
+BL_abadPos = [-BODY_WIDTH/2.0, -BODY_LENGTH/2.0, 0]
 
 
 L1 = 120
@@ -326,39 +330,39 @@ class Trajectory:
         self.z = -GROUND_DEPTH - pos[2]/100.0 * 25
         
     def orientControl(self, orient): #orient is a list [roll, pitch, yaw] where each element is between 0 and 100
-        alpha = math.pi/12 * orient[2]/100.0
-        d = 150*math.sqrt(2*(1-math.cos(alpha))) 
-        if alpha < 0:
-            d *= -1
+        psi = math.pi/20 * orient[2]/100.0
+        theta = math.pi/20 * orient[1]/100.0
+        phi = math.pi/20 * orient[0]/100.0
         if self.leg == "FR":
-            self.x = d*math.cos(alpha/2)
-            self.y = -d*math.sin(alpha/2) + (300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0*math.cos(math.pi/24 * orient[1]/100.0) - (300/2.0*math.sin(math.pi/24 * orient[1]/100.0) + GROUND_DEPTH) * math.sin(math.pi/24 * orient[1]/100.0)
-            self.z = -(300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0*math.sin(math.pi/24 * orient[1]/100.0) - (300/2.0*math.sin(math.pi/24 * orient[1]/100.0) + GROUND_DEPTH) * math.cos(math.pi/24 * orient[1]/100.0) 
-            # self.x = (50+(100-100*math.cos(math.pi/24 * orient[0]/100.0))/2.0)*math.cos(math.pi/24 * orient[0]/100.0) - (100/2.0 * math.sin(math.pi/24 * orient[0]/100.0) + GROUND_DEPTH)*math.sin(math.pi/24 * orient[0]/100.0)
-            # self.y = 0
-            # self.z = -(50+(100-100*math.cos(math.pi/24 * orient[0]/100.0))/2.0) * math.sin(math.pi/24 * orient[0]/100.0) - (100/2.0 * math.sin(math.pi/24 * orient[0]/100.0) + GROUND_DEPTH) * math.cos(math.pi/24 * orient[0]/100.0)
+            xOffsetDir = -1
+            yOffsetDir = -1
         elif self.leg == "FL":
-            self.x = d*math.cos(alpha/2) 
-            self.y = -d*math.sin(alpha/2) + (300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0*math.cos(math.pi/24 * orient[1]/100.0) - (300/2.0*math.sin(math.pi/24 * orient[1]/100.0) + GROUND_DEPTH) * math.sin(math.pi/24 * orient[1]/100.0)
-            self.z = -(300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0*math.sin(math.pi/24 * orient[1]/100.0) - (300/2.0*math.sin(math.pi/24 * orient[1]/100.0) + GROUND_DEPTH) * math.cos(math.pi/24 * orient[1]/100.0) 
-            # self.x = -(50+(100-100*math.cos(math.pi/24 * orient[0]/100.0))/2.0)*math.cos(math.pi/24 * orient[0]/100.0) - (GROUND_DEPTH - 100/2.0 * math.sin(math.pi/24 * orient[0]/100.0))*math.sin(math.pi/24 * orient[0]/100.0)
-            # self.y = 0
-            # self.z = (50+(100-100*math.cos(math.pi/24 * orient[0]/100.0))/2.0) * math.sin(math.pi/24 * orient[0]/100.0) - (GROUND_DEPTH - 100/2.0 * math.sin(math.pi/24 * orient[0]/100.0)) * math.cos(math.pi/24 * orient[0]/100.0)
+            xOffsetDir = 1
+            yOffsetDir = -1
         elif self.leg == "BR":
-            self.x = -d*math.cos(alpha/2)
-            self.y = d*math.sin(alpha/2) - (300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0 * math.cos(math.pi/24 * orient[1]/100.0) - (GROUND_DEPTH - 300/2.0*math.sin(math.pi/24 * orient[1]/100.0))*math.sin(math.pi/24 * orient[1]/100.0)
-            self.z = (300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0 * math.sin(math.pi/24 * orient[1]/100.0) - (GROUND_DEPTH - 300/2.0 * math.sin(math.pi/24 * orient[1]/100.0)) * math.cos(math.pi/24 * orient[1]/100.0) 
-            # self.x = (50+(100-100*math.cos(math.pi/24 * orient[0]/100.0))/2.0)*math.cos(math.pi/24 * orient[0]/100.0) - (100/2.0 * math.sin(math.pi/24 * orient[0]/100.0) + GROUND_DEPTH)*math.sin(math.pi/24 * orient[0]/100.0)
-            # self.y = 0
-            # self.z = -(50+(100-100*math.cos(math.pi/24 * orient[0]/100.0))/2.0) * math.sin(math.pi/24 * orient[0]/100.0) - (100/2.0 * math.sin(math.pi/24 * orient[0]/100.0) + GROUND_DEPTH) * math.cos(math.pi/24 * orient[0]/100.0)
+            xOffsetDir = -1
+            yOffsetDir = 1
         elif self.leg == "BL":
-            self.x = -d*math.cos(alpha/2) 
-            self.y = d*math.sin(alpha/2) - (300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0 * math.cos(math.pi/24 * orient[1]/100.0) - (GROUND_DEPTH - 300/2.0*math.sin(math.pi/24 * orient[1]/100.0))*math.sin(math.pi/24 * orient[1]/100.0)
-            self.z = (300-300*math.cos(math.pi/24 * orient[1]/100.0))/2.0 * math.sin(math.pi/24 * orient[1]/100.0) - (GROUND_DEPTH - 300/2.0 * math.sin(math.pi/24 * orient[1]/100.0)) * math.cos(math.pi/24 * orient[1]/100.0) 
-            # self.x = -(50+(100-100*math.cos(math.pi/24 * orient[0]/100.0))/2.0)*math.cos(math.pi/24 * orient[0]/100.0) - (100/2.0 * math.sin(math.pi/24 * orient[0]/100.0) + GROUND_DEPTH)*math.sin(math.pi/24 * orient[0]/100.0)
-            # self.y = 0
-            # self.z = (50+(100-100*math.cos(math.pi/24 * orient[0]/100.0))/2.0) * math.sin(math.pi/24 * orient[0]/100.0) - (GROUND_DEPTH - 100/2.0 * math.sin(math.pi/24 * orient[0]/100.0)) * math.cos(math.pi/24 * orient[0]/100.0)
-
+            xOffsetDir = 1
+            yOffsetDir = 1
+            
+        d_L0 = np.array([-xOffsetDir*ABAD_LENGTH, 0, -GROUND_DEPTH, 1])
+        
+        H_L0_B0 = np.array([[1, 0, 0, xOffsetDir*BODY_WIDTH/2.0], [0, 1, 0, yOffsetDir*BODY_LENGTH/2.0], [0, 0, 1, 0], [0, 0, 0, 1]])
+        H_B3_L1 = np.array([[1, 0, 0, -xOffsetDir*BODY_WIDTH/2.0], [0, 1, 0, -yOffsetDir*BODY_LENGTH/2.0], [0, 0, 1, 0], [0, 0, 0, 1]])
+            
+        H_B0_B1 = np.array([[np.cos(psi), -np.sin(psi), 0, 0], [np.sin(psi), np.cos(psi), 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]])
+        H_B1_B2 = np.array([[1, 0, 0, 0], [0, np.cos(theta), -np.sin(theta), 0], [0, np.sin(theta), np.cos(theta), 0], [0, 0, 0, 1]])
+        H_B2_B3 = np.array([[np.cos(phi), 0, -np.sin(phi), 0], [0, 1, 0, 0], [np.sin(phi), 0, np.cos(psi), 0], [0, 0, 0, 1]])
+        
+        H_L0_L1 = H_L0_B0 @ H_B0_B1 @ H_B1_B2 @ H_B2_B3 @ H_B3_L1
+        d_L1 = np.linalg.inv(H_L0_L1) @ d_L0
+        
+        if self.leg == "FR":
+            print(d_L1)
+        self.x = d_L1[0]
+        self.y = d_L1[1]
+        self.z = d_L1[2]
 
     def getX(self):
         return self.x
@@ -387,13 +391,13 @@ def solveIK(targetPos, abadPos):
 
 def translateTrajectory(pos, leg):
     if leg == "FR":
-        return [pos[0]+FR_abadPos[0]+50, pos[1]+FR_abadPos[1], pos[2]]
+        return [pos[0]+FR_abadPos[0]+ABAD_LENGTH, pos[1]+FR_abadPos[1], pos[2]]
     elif leg == "FL":
-        return [pos[0]+FL_abadPos[0]-50, pos[1]+FL_abadPos[1], pos[2]]
+        return [pos[0]+FL_abadPos[0]-ABAD_LENGTH, pos[1]+FL_abadPos[1], pos[2]]
     elif leg == "BR":
-        return [pos[0]+BR_abadPos[0]+50, pos[1]+BR_abadPos[1], pos[2]]
+        return [pos[0]+BR_abadPos[0]+ABAD_LENGTH, pos[1]+BR_abadPos[1], pos[2]]
     elif leg == "BL":
-        return [pos[0]+BL_abadPos[0]-50, pos[1]+BL_abadPos[1], pos[2]]
+        return [pos[0]+BL_abadPos[0]-ABAD_LENGTH, pos[1]+BL_abadPos[1], pos[2]]
     return
 
 def drawLegs():
@@ -406,11 +410,11 @@ def drawLegs():
     
     # comment/uncomment below if doing orientation control
     FR_footPos = [FR_trajectory.getX() + FR_abadPos[0], FR_trajectory.getY() + FR_abadPos[1], FR_trajectory.getZ()]
-    FL_footPos = [FL_trajectory.getX() + FL_abadPos[0], FL_trajectory.getY() + FL_abadPos[1], FL_trajectory.getZ()]
-    BR_footPos = [BR_trajectory.getX() + BR_abadPos[0], BR_trajectory.getY() + BR_abadPos[1], BR_trajectory.getZ()]
-    BL_footPos = [BL_trajectory.getX() + BL_abadPos[0], BL_trajectory.getY() + BL_abadPos[1], BL_trajectory.getZ()]
+    FL_footPos = [FL_trajectory.getX() - FR_abadPos[0], FL_trajectory.getY() + FL_abadPos[1], FL_trajectory.getZ()]
+    BR_footPos = [BR_trajectory.getX() + FR_abadPos[0], BR_trajectory.getY() + BR_abadPos[1], BR_trajectory.getZ()]
+    BL_footPos = [BL_trajectory.getX() - FR_abadPos[0], BL_trajectory.getY() + BL_abadPos[1], BL_trajectory.getZ()]
     
-    print(np.linalg.norm(np.array(FR_footPos) - np.array(FL_footPos)))
+    
     
     #draw feet as points
     ax.scatter(FR_footPos[0], FR_footPos[1], FR_footPos[2], color='black', s=100, label='Point')
@@ -536,7 +540,7 @@ BL_trajectory.setDir("still")
 
 
 ani = animation.FuncAnimation(fig, animate, frames=200, interval=50)
-axSlider = plt.axes([0.25, 0, 0.65, 0.03], facecolor='lightgoldenrodyellow')
+axSlider = plt.axes([0.25, 0.15, 0.65, 0.03], facecolor='lightgoldenrodyellow')
 speedSlider = Slider(axSlider, 'Gait Speed', 0, 100, valinit=GAIT_SPEED)
 
 rollAxSlider = plt.axes([0.25, 0.1, 0.65, 0.03], facecolor='lightgoldenrodyellow')
