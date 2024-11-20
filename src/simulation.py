@@ -353,7 +353,7 @@ class Trajectory:
             
         H_B0_B1 = np.array([[np.cos(psi), -np.sin(psi), 0, 0], [np.sin(psi), np.cos(psi), 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]])
         H_B1_B2 = np.array([[1, 0, 0, 0], [0, np.cos(theta), -np.sin(theta), 0], [0, np.sin(theta), np.cos(theta), 0], [0, 0, 0, 1]])
-        H_B2_B3 = np.array([[np.cos(phi), 0, -np.sin(phi), 0], [0, 1, 0, 0], [np.sin(phi), 0, np.cos(psi), 0], [0, 0, 0, 1]])
+        H_B2_B3 = np.array([[np.cos(phi), 0, -np.sin(phi), 0], [0, 1, 0, 0], [np.sin(phi), 0, np.cos(phi), 0], [0, 0, 0, 1]])
         
         H_L0_L1 = H_L0_B0 @ H_B0_B1 @ H_B1_B2 @ H_B2_B3 @ H_B3_L1
         d_L1 = np.linalg.inv(H_L0_L1) @ d_L0

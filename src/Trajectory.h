@@ -20,9 +20,11 @@ private:
   char dir;
   float body_length;
   float body_width;
+  float abad_length;
+  float ground_depth;
 
 public:
-  Trajectory(float step_length_init, float step_height_init, float back_step_depth_init, float side_step_length_init, float side_step_height_init, float side_back_step_height_init, int leg_init);
+  Trajectory(float step_length_init, float step_height_init, float back_step_depth_init, float side_step_length_init, float side_step_height_init, float side_back_step_height_init, int leg_init, float ground_depth_init);
   void interpolateNext(int speed);
   bool checkGrounded();
   void setDir(char dir_val);

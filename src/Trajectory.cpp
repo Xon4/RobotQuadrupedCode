@@ -1,7 +1,10 @@
 #include "Trajectory.h"
 #include <Arduino.h>
+#include <BasicLinearAlgebra.h>
 
-Trajectory::Trajectory(float step_length_init, float step_height_init, float back_step_depth_init, float side_step_length_init, float side_step_height_init, float side_back_step_depth_init, int leg_init)
+using namespace BLA;
+
+Trajectory::Trajectory(float step_length_init, float step_height_init, float back_step_depth_init, float side_step_length_init, float side_step_height_init, float side_back_step_depth_init, int leg_init, float ground_depth_init)
 {
     leg = leg_init; // 1 -> "FR", 2 -> "FL", 3 -> "BR", 4 -> "BL"
     step_length = step_length_init;
@@ -13,7 +16,10 @@ Trajectory::Trajectory(float step_length_init, float step_height_init, float bac
     interpolations = 20;
     speed_factor = 10;
     body_length = 244;
-    body_width = 182.4;
+    body_width = 105;
+    abad_length = 38.7;
+    ground_depth = ground_depth_init;
+    
     dir = 'F';
     if (leg == 4 || leg == 1)
     {
@@ -495,37 +501,43 @@ void Trajectory::posControl(float pos[3])
 
 void Trajectory::orientControl(float orient[3])
 {
-    float alpha = PI / 9.0 * orient[2] / 100.0;
-    float d = body_length / 2.0 * sqrt(2 * (1 - cos(alpha)));
-    if (alpha < 0)
-    {
-        d *= -1;
+    float psi = PI/20 * orient[2]/100.0;
+    float theta = PI/20 * orient[1]/100.0;
+    float phi = PI/20 * orient[0]/100.0;
+
+    int xOffsetDir = 1;
+    int yOffsetDir = 1;
+
+    if (leg == 1) {
+        xOffsetDir = -1;
+        yOffsetDir = -1;
+    } else if (leg == 2) {
+        xOffsetDir = 1;
+        yOffsetDir = -1;
+    } else if (leg == 3) {
+        xOffsetDir = -1;
+        yOffsetDir = 1;
+    } else if (leg == 4) {
+        xOffsetDir = 1;
+        yOffsetDir = 1;
     }
-    if (leg == 1)
-    {
-        x = d * cos(alpha / 2.0);
-        y = -d * cos(alpha / 2.0);
-        z = 20 + body_width / 2.0 * sin(PI / 24.0 * orient[0] / 100.0) + body_length / 2.0 * sin(PI / 10.0 * orient[1] / 100.0);
-    }
-    else if (leg == 2)
-    {
-        x = d * cos(alpha / 2.0);
-        y = -d * sin(alpha / 2.0);
-        z = 20 - body_width / 2.0 * sin(PI / 24.0 * orient[0] / 100.0) + body_length / 2.0 * sin(PI / 10.0 * orient[1] / 100.0);
-    }
-    else if (leg == 3)
-    {
-        x = -d * cos(alpha / 2.0);
-        y = d * sin(alpha / 2.0);
-        z = 20 + body_width / 2.0 * sin(PI / 24.0 * orient[0] / 100.0) - body_width / 2.0 * sin(PI / 12.0 * orient[1] / 100.0);
-    }
-    else if (leg == 4)
-    {
-        x = -d * cos(alpha / 2.0);
-        y = d * sin(alpha / 2.0);
-        z = 20 - body_width / 2.0 * sin(PI / 24.0 * orient[0] / 100.0) - body_length / 2.0 * sin(PI / 24.0 * orient[1] / 100.0);
-    }
-}
+
+    Matrix<4> d_L0 = {-xOffsetDir*abad_length, 0, -ground_depth, 1};
+
+    Matrix<4, 4> H_L0_B0 = {1, 0, 0, xOffsetDir*body_width/2.0, 0, 1, 0, yOffsetDir*body_length/2.0, 0, 0, 1, 0, 0, 0, 0, 1};
+    Matrix<4, 4> H_B3_L1 = {1, 0, 0, -xOffsetDir*body_width/2.0, 0, 1, 0, -yOffsetDir*body_length/2.0, 0, 0, 1, 0, 0, 0, 0, 1};
+
+    Matrix<4, 4> H_B0_B1 = {cos(psi), -sin(psi), 0, 0, sin(psi), cos(psi), 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+    Matrix<4, 4> H_B1_B2 = {1, 0, 0, 0, 0, cos(theta), -sin(theta), 0, 0, sin(theta), cos(theta), 0, 0, 0, 0, 1};
+    Matrix<4, 4> H_B2_B3 = {cos(phi), 0, -sin(phi), 0, 0, 1, 0, 0, sin(phi), 0, cos(phi), 0, 0, 0, 0, 1};
+
+    Matrix<4, 4> H_L0_L1 = H_L0_B0 * H_B0_B1 * H_B1_B2 * H_B2_B3 * H_B3_L1;
+    Matrix<4> d_L1 = Inverse(H_L0_L1) * d_L0;
+    
+    x = d_L1(0);
+    y = d_L1(1);
+    z = d_L1(2);
+}   
 
 char Trajectory::getDir()
 {
