@@ -358,8 +358,6 @@ class Trajectory:
         H_L0_L1 = H_L0_B0 @ H_B0_B1 @ H_B1_B2 @ H_B2_B3 @ H_B3_L1
         d_L1 = np.linalg.inv(H_L0_L1) @ d_L0
         
-        if self.leg == "FR":
-            print(d_L1)
         self.x = d_L1[0]
         self.y = d_L1[1]
         self.z = d_L1[2]

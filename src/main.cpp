@@ -45,7 +45,7 @@ int millis_delay = 10;
 // mechanical constants
 const float L1 = 120;
 const float L2 = 120;
-const float L3 = 37.8;
+const float L3 = 38.7;
 
 // const float STEP_LENGTH = 50;
 // const float STEP_HEIGHT = 50;
@@ -193,49 +193,73 @@ void loop()
   {
     if (ps5.R2()) // orientation & position control mode
     {
+      FR_trajectory.setDir('N');  //set direction to null since we need to detect a change in direction when going back to gait mode
+      FL_trajectory.setDir('N');
+      BR_trajectory.setDir('N');
+      BL_trajectory.setDir('N');  
+
       leds[0] = CRGB(52, 235, 85);
       leds[1] = CRGB(52, 235, 85);
 
       millis_delay = 1;
-      if (abs(ps5.RStickX()) > 5 || abs(ps5.RStickY()) > 5) // tolerances to account for slight joystick offsets
+
+      float orient[3];
+      if (abs(ps5.LStickX()) > 5 || abs(ps5.LStickY()) > 5 || abs(ps5.RStickX()) > 5) // tolerances to account for slight joystick offsets
       {
-        float orient[3] = {0, -float(map(ps5.RStickY(), -127, 127, -100, 100)), -float(map(ps5.RStickX(), -127, 127, -100, 100))};
-        FR_trajectory.orientControl(orient);
-        FL_trajectory.orientControl(orient);
-        BR_trajectory.orientControl(orient);
-        BL_trajectory.orientControl(orient);
+        orient[0] = float(map(ps5.RStickX(), -127, 127, -100, 100));
+        orient[1] = float(map(ps5.LStickY(), -127, 127, -100, 100));
+        orient[2] = float(map(ps5.LStickX(), -127, 127, -100, 100));
+
+      } else {
+        orient[0] = 0;
+        orient[1] = 0;
+        orient[2] = 0;
       }
-      else if (abs(ps5.LStickX()) > 5 || abs(ps5.LStickY()) > 5)
-      {
-        float pos[3] = {float(map(ps5.LStickX(), -127, 127, -100, 100)), float(map(ps5.LStickY(), -127, 127, -100, 100)), 0};
-        FR_trajectory.posControl(pos);
-        FL_trajectory.posControl(pos);
-        BR_trajectory.posControl(pos);
-        BL_trajectory.posControl(pos);
-      }
+      FR_trajectory.orientControl(orient);
+      FL_trajectory.orientControl(orient);
+      BR_trajectory.orientControl(orient);
+      BL_trajectory.orientControl(orient);
+
+      FR_leg.updateAngles(FR_trajectory.get_x(), FR_trajectory.get_y(), FR_trajectory.get_z());
+      FL_leg.updateAngles(-FL_trajectory.get_x(), FL_trajectory.get_y(), FL_trajectory.get_z());
+      BR_leg.updateAngles(BR_trajectory.get_x(), BR_trajectory.get_y(), BR_trajectory.get_z());
+      BL_leg.updateAngles(-BL_trajectory.get_x(), BL_trajectory.get_y(), BL_trajectory.get_z());
+      
     }
-    else if (ps5.L2())
+    else if (ps5.L2()) 
     {
+      FR_trajectory.setDir('N');  //set direction to null since we need to detect a change in direction when going back to gait mode
+      FL_trajectory.setDir('N');
+      BR_trajectory.setDir('N');
+      BL_trajectory.setDir('N');  
+
       leds[0] = CRGB(52, 235, 85);
       leds[1] = CRGB(52, 235, 85);
 
       millis_delay = 1;
-      if (abs(ps5.RStickX()) > 5) // tolerances to account for slight joystick offsets
+
+      float pos[3];
+      if (abs(ps5.LStickX()) > 5 || abs(ps5.LStickY()) > 5 || abs(ps5.RStickX()) > 5)
       {
-        float orient[3] = {float(map(ps5.RStickX(), -127, 127, -100, 100)), 0, 0};
-        FR_trajectory.orientControl(orient);
-        FL_trajectory.orientControl(orient);
-        BR_trajectory.orientControl(orient);
-        BL_trajectory.orientControl(orient);
+        pos[0] = float(map(ps5.LStickX(), -127, 127, -100, 100));
+        pos[1] = float(map(ps5.LStickY(), -127, 127, -100, 100));
+        pos[2] = float(map(ps5.RStickY(), -127, 127, -100, 100));
+      } else {
+        pos[0] = 0;
+        pos[1] = 0;
+        pos[2] = 0;
       }
-      else if (abs(ps5.LStickY()) > 5)
-      {
-        float pos[3] = {0, 0, float(map(ps5.LStickY(), -127, 127, -100, 100))};
-        FR_trajectory.posControl(pos);
-        FL_trajectory.posControl(pos);
-        BR_trajectory.posControl(pos);
-        BL_trajectory.posControl(pos);
-      }
+
+      FR_trajectory.posControl(pos);
+      FL_trajectory.posControl(pos);
+      BR_trajectory.posControl(pos);
+      BL_trajectory.posControl(pos);
+
+      FR_leg.updateAngles(FR_trajectory.get_x() + L3, FR_trajectory.get_y(), FR_trajectory.get_z() - FRONT_GROUND_DEPTH);
+      FL_leg.updateAngles(FL_trajectory.get_x() - L3, FL_trajectory.get_y(), FL_trajectory.get_z() - FRONT_GROUND_DEPTH);
+      BR_leg.updateAngles(BR_trajectory.get_x() + L3, BR_trajectory.get_y(), BR_trajectory.get_z() - FRONT_GROUND_DEPTH);
+      BL_leg.updateAngles(BL_trajectory.get_x() - L3, BL_trajectory.get_y(), BL_trajectory.get_z() - FRONT_GROUND_DEPTH);
+      
     }
     else // trot gait mode
     {
