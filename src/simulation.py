@@ -401,16 +401,16 @@ def translateTrajectory(pos, leg):
 def drawLegs():
     #end effector positions
     # comment/uncomment below if doing gait control
-    # FR_footPos = translateTrajectory([FR_trajectory.getX(), FR_trajectory.getY(), FR_trajectory.getZ()], "FR")
-    # FL_footPos = translateTrajectory([FL_trajectory.getX(), FL_trajectory.getY(), FL_trajectory.getZ()], "FL")
-    # BR_footPos = translateTrajectory([BR_trajectory.getX(), BR_trajectory.getY(), BR_trajectory.getZ()], "BR")
-    # BL_footPos = translateTrajectory([BL_trajectory.getX(), BL_trajectory.getY(), BL_trajectory.getZ()], "BL")
+    FR_footPos = translateTrajectory([FR_trajectory.getX(), FR_trajectory.getY(), FR_trajectory.getZ()], "FR")
+    FL_footPos = translateTrajectory([FL_trajectory.getX(), FL_trajectory.getY(), FL_trajectory.getZ()], "FL")
+    BR_footPos = translateTrajectory([BR_trajectory.getX(), BR_trajectory.getY(), BR_trajectory.getZ()], "BR")
+    BL_footPos = translateTrajectory([BL_trajectory.getX(), BL_trajectory.getY(), BL_trajectory.getZ()], "BL")
     
     # comment/uncomment below if doing orientation control
-    FR_footPos = [FR_trajectory.getX() + FR_abadPos[0], FR_trajectory.getY() + FR_abadPos[1], FR_trajectory.getZ()]
-    FL_footPos = [FL_trajectory.getX() - FR_abadPos[0], FL_trajectory.getY() + FL_abadPos[1], FL_trajectory.getZ()]
-    BR_footPos = [BR_trajectory.getX() + FR_abadPos[0], BR_trajectory.getY() + BR_abadPos[1], BR_trajectory.getZ()]
-    BL_footPos = [BL_trajectory.getX() - FR_abadPos[0], BL_trajectory.getY() + BL_abadPos[1], BL_trajectory.getZ()]
+    # FR_footPos = [FR_trajectory.getX() + FR_abadPos[0], FR_trajectory.getY() + FR_abadPos[1], FR_trajectory.getZ()]
+    # FL_footPos = [FL_trajectory.getX() - FR_abadPos[0], FL_trajectory.getY() + FL_abadPos[1], FL_trajectory.getZ()]
+    # BR_footPos = [BR_trajectory.getX() + FR_abadPos[0], BR_trajectory.getY() + BR_abadPos[1], BR_trajectory.getZ()]
+    # BL_footPos = [BL_trajectory.getX() - FR_abadPos[0], BL_trajectory.getY() + BL_abadPos[1], BL_trajectory.getZ()]
     
     
     
@@ -491,35 +491,35 @@ def animate(frame):
    
     
     
-    # newKey = keyboard.get_hotkey_name()
+    newKey = keyboard.get_hotkey_name()
 
-    # if newKey == "up":
-    #     dirState = "forward"
-    # elif newKey == "down":
-    #     dirState = "backward"
-    # elif newKey == "right":
-    #     dirState = "right_turn"
-    # elif newKey == "left":
-    #     dirState = "left_turn"
-    # elif newKey == "":
-    #     dirState = "still"
+    if newKey == "up":
+        dirState = "forward"
+    elif newKey == "down":
+        dirState = "backward"
+    elif newKey == "right":
+        dirState = "right_turn"
+    elif newKey == "left":
+        dirState = "left_turn"
+    elif newKey == "":
+        dirState = "still"
     
-    # if FR_trajectory.getDir() != dirState:
-    #     FR_trajectory.setDir(dirState)
-    #     FL_trajectory.setDir(dirState)
-    #     BR_trajectory.setDir(dirState)
-    #     BL_trajectory.setDir(dirState)
+    if FR_trajectory.getDir() != dirState:
+        FR_trajectory.setDir(dirState)
+        FL_trajectory.setDir(dirState)
+        BR_trajectory.setDir(dirState)
+        BL_trajectory.setDir(dirState)
        
-    # FR_trajectory.interpolate(gaitSpeed)
-    # FL_trajectory.interpolate(gaitSpeed)
-    # BR_trajectory.interpolate(gaitSpeed)
-    # BL_trajectory.interpolate(gaitSpeed)
+    FR_trajectory.interpolate(gaitSpeed)
+    FL_trajectory.interpolate(gaitSpeed)
+    BR_trajectory.interpolate(gaitSpeed)
+    BL_trajectory.interpolate(gaitSpeed)
     
 
-    FR_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
-    FL_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
-    BR_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
-    BL_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
+    # FR_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
+    # FL_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
+    # BR_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
+    # BL_trajectory.orientControl([rollSlider.val, pitchSlider.val, yawSlider.val])
     
     
 
@@ -541,13 +541,13 @@ ani = animation.FuncAnimation(fig, animate, frames=200, interval=50)
 axSlider = plt.axes([0.25, 0.15, 0.65, 0.03], facecolor='lightgoldenrodyellow')
 speedSlider = Slider(axSlider, 'Gait Speed', 0, 100, valinit=GAIT_SPEED)
 
-rollAxSlider = plt.axes([0.25, 0.1, 0.65, 0.03], facecolor='lightgoldenrodyellow')
-pitchAxSlider = plt.axes([0.25, 0.05, 0.65, 0.03], facecolor='lightgoldenrodyellow')
-yawAxSlider = plt.axes([0.25, 0, 0.65, 0.03], facecolor='lightgoldenrodyellow')
+# rollAxSlider = plt.axes([0.25, 0.1, 0.65, 0.03], facecolor='lightgoldenrodyellow')
+# pitchAxSlider = plt.axes([0.25, 0.05, 0.65, 0.03], facecolor='lightgoldenrodyellow')
+# yawAxSlider = plt.axes([0.25, 0, 0.65, 0.03], facecolor='lightgoldenrodyellow')
 
-rollSlider = Slider(rollAxSlider, 'rollPos', -100, 100, valinit=0)
-pitchSlider = Slider(pitchAxSlider, 'pitchPos', -100, 100, valinit=0)
-yawSlider = Slider(yawAxSlider, 'yawPos', -100, 100, valinit=0)
+# rollSlider = Slider(rollAxSlider, 'rollPos', -100, 100, valinit=0)
+# pitchSlider = Slider(pitchAxSlider, 'pitchPos', -100, 100, valinit=0)
+# yawSlider = Slider(yawAxSlider, 'yawPos', -100, 100, valinit=0)
 
 # Show the plot
 plt.show()

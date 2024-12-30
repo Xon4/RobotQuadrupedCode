@@ -55,14 +55,14 @@ const float L3 = 38.7;
 // const float SIDE_BACK_STEP_DEPTH = 10;
 // const float GROUND_DEPTH = 180;
 
-const float STEP_LENGTH = 70;
+const float STEP_LENGTH = 90;
 const float STEP_HEIGHT = 40;
-const float BACK_STEP_DEPTH = 1;
-const float SIDE_STEP_LENGTH = 60;
-const float SIDE_STEP_HEIGHT = 40;
-const float SIDE_BACK_STEP_DEPTH = 1;
+const float BACK_STEP_DEPTH = 5;
+const float SIDE_STEP_LENGTH = 50;
+const float SIDE_STEP_HEIGHT = 60;
+const float SIDE_BACK_STEP_DEPTH = 5;
 const float FRONT_GROUND_DEPTH = 200;
-const float BACK_GROUND_DEPTH = 205;
+const float BACK_GROUND_DEPTH = 200;
 
 // controller input variables
 char input_dir = 'S';
@@ -111,17 +111,17 @@ void setup()
   pwm.writeMicroseconds(FR_hip, map(FR_leg.get_hip_angle(), 0, 180, 1000, 2200));
   pwm.writeMicroseconds(FR_knee, map(FR_leg.get_knee_angle() - 3, 0, 180, 1000, 2200));
 
-  pwm.writeMicroseconds(FL_abad, -map(FL_leg.get_abad_angle(), 0, 180, 1000, 2200));
+  pwm.writeMicroseconds(FL_abad, map(FL_leg.get_abad_angle() - 4, 0, 180, 1000, 2200));
   pwm.writeMicroseconds(FL_hip, map(FL_leg.get_hip_angle() - 10, 0, 180, 1000, 2200));
-  pwm.writeMicroseconds(FL_knee, map(FL_leg.get_knee_angle(), 0, 180, 1000, 2200));
+  pwm.writeMicroseconds(FL_knee, map(FL_leg.get_knee_angle() - 5, 0, 180, 1000, 2200));
 
   pwm.writeMicroseconds(BR_abad, map(BR_leg.get_abad_angle() - 5, 0, 180, 1000, 2200));
   pwm.writeMicroseconds(BR_hip, map(BR_leg.get_hip_angle(), 0, 180, 1000, 2200));
-  pwm.writeMicroseconds(BR_knee, map(BR_leg.get_knee_angle() - 5, 0, 180, 1000, 2200));
+  pwm.writeMicroseconds(BR_knee, map(BR_leg.get_knee_angle() - 4, 0, 180, 1000, 2200));
 
-  pwm.writeMicroseconds(BL_abad, -map(BL_leg.get_abad_angle(), 0, 180, 1000, 2200));
-  pwm.writeMicroseconds(BL_hip, map(BL_leg.get_hip_angle() - 10, 0, 180, 1000, 2200));
-  pwm.writeMicroseconds(BL_knee, map(BL_leg.get_knee_angle(), 0, 180, 1000, 2200));
+  pwm.writeMicroseconds(BL_abad, map(BL_leg.get_abad_angle(), 0, 180, 1000, 2200));
+  pwm.writeMicroseconds(BL_hip, map(BL_leg.get_hip_angle() - 12, 0, 180, 1000, 2200));
+  pwm.writeMicroseconds(BL_knee, map(BL_leg.get_knee_angle() + 5, 0, 180, 1000, 2200));
 
   ps5.begin("7c:66:ef:25:7b:a5"); // replace with MAC address of your controller
 }
@@ -151,6 +151,16 @@ void loop()
   {
     joystick_magnitude = abs(ps5.RStickX());
     input_dir = 'l';
+  } 
+  else if (ps5.LStickY() > 30)
+  {
+    joystick_magnitude = abs(ps5.LStickY());
+    input_dir = 'F';
+  }
+  else if (ps5.LStickY() < -30)
+  {
+    joystick_magnitude = abs(ps5.LStickY());
+    input_dir = 'B';
   }
   else if (ps5.LStickX() > 30)
   {
@@ -162,16 +172,6 @@ void loop()
     joystick_magnitude = abs(ps5.LStickX());
     input_dir = 'L';
   }
-  else if (ps5.LStickY() > 30)
-  {
-    joystick_magnitude = abs(ps5.LStickY());
-    input_dir = 'F';
-  }
-  else if (ps5.LStickY() < -30)
-  {
-    joystick_magnitude = abs(ps5.LStickY());
-    input_dir = 'B';
-  }
   else
   {
     joystick_magnitude = 0;
@@ -179,27 +179,21 @@ void loop()
   }
 
   
-  if (ps5.Square())
-  {
-    digitalWrite(SPEAKER_PIN, HIGH);
-    delay(10);
-    digitalWrite(SPEAKER_PIN, LOW);
-  }
   // Serial.print(FL_trajectory.getDir());
   // Serial.print(", ");
   // Serial.println(BL_trajectory.getDir());
 
   if (fabs(current_time - prev_time) >= millis_delay)
   {
-    if (ps5.R2()) // orientation & position control mode
+    if (ps5.R2()) // orientation control
     {
       FR_trajectory.setDir('N');  //set direction to null since we need to detect a change in direction when going back to gait mode
       FL_trajectory.setDir('N');
       BR_trajectory.setDir('N');
       BL_trajectory.setDir('N');  
 
-      leds[0] = CRGB(52, 235, 85);
-      leds[1] = CRGB(52, 235, 85);
+      leds[0] = CRGB(5, 255, 22);
+      leds[1] = CRGB(5, 255, 22);
 
       millis_delay = 1;
 
@@ -226,20 +220,20 @@ void loop()
       BL_leg.updateAngles(-BL_trajectory.get_x(), BL_trajectory.get_y(), BL_trajectory.get_z());
       
     }
-    else if (ps5.L2()) 
+    else if (ps5.L2()) // pos control
     {
       FR_trajectory.setDir('N');  //set direction to null since we need to detect a change in direction when going back to gait mode
       FL_trajectory.setDir('N');
       BR_trajectory.setDir('N');
       BL_trajectory.setDir('N');  
 
-      leds[0] = CRGB(52, 235, 85);
-      leds[1] = CRGB(52, 235, 85);
+      leds[0] = CRGB(245, 7, 43);
+      leds[1] = CRGB(245, 7, 43);
 
       millis_delay = 1;
 
       float pos[3];
-      if (abs(ps5.LStickX()) > 5 || abs(ps5.LStickY()) > 5 || abs(ps5.RStickX()) > 5)
+      if (abs(ps5.LStickX()) > 5 || abs(ps5.LStickY()) > 5 || abs(ps5.RStickY()) > 5)
       {
         pos[0] = float(map(ps5.LStickX(), -127, 127, -100, 100));
         pos[1] = float(map(ps5.LStickY(), -127, 127, -100, 100));
@@ -260,6 +254,20 @@ void loop()
       BR_leg.updateAngles(BR_trajectory.get_x() + L3, BR_trajectory.get_y(), BR_trajectory.get_z() - FRONT_GROUND_DEPTH);
       BL_leg.updateAngles(BL_trajectory.get_x() - L3, BL_trajectory.get_y(), BL_trajectory.get_z() - FRONT_GROUND_DEPTH);
       
+    }
+    else if (ps5.Square()) // bark mode
+    {
+      FR_trajectory.setDir('N');  //set direction to null since we need to detect a change in direction when going back to gait mode
+      FL_trajectory.setDir('N');
+      BR_trajectory.setDir('N');
+      BL_trajectory.setDir('N');  
+
+      leds[0] = CRGB(218, 250, 7);
+      leds[1] = CRGB(218, 250, 7);
+
+      digitalWrite(SPEAKER_PIN, HIGH);
+      delay(100);
+      digitalWrite(SPEAKER_PIN, LOW);
     }
     else // trot gait mode
     {
@@ -287,21 +295,21 @@ void loop()
     }
     FastLED.show();
 
-    pwm.writeMicroseconds(FR_abad, map(FR_leg.get_abad_angle(), 0, 180, 1000, 2200));
-    pwm.writeMicroseconds(FR_hip, map(FR_leg.get_hip_angle(), 0, 180, 1000, 2200));
-    pwm.writeMicroseconds(FR_knee, map(FR_leg.get_knee_angle() - 3, 0, 180, 1000, 2200));
+  pwm.writeMicroseconds(FR_abad, map(FR_leg.get_abad_angle(), 0, 180, 1000, 2200));
+  pwm.writeMicroseconds(FR_hip, map(FR_leg.get_hip_angle(), 0, 180, 1000, 2200));
+  pwm.writeMicroseconds(FR_knee, map(FR_leg.get_knee_angle() - 3, 0, 180, 1000, 2200));
 
-    pwm.writeMicroseconds(FL_abad, map(FL_leg.get_abad_angle(), 0, 180, 1000, 2200));
-    pwm.writeMicroseconds(FL_hip, map(FL_leg.get_hip_angle() - 10, 0, 180, 1000, 2200));
-    pwm.writeMicroseconds(FL_knee, map(FL_leg.get_knee_angle(), 0, 180, 1000, 2200));
+  pwm.writeMicroseconds(FL_abad, map(FL_leg.get_abad_angle() - 4, 0, 180, 1000, 2200));
+  pwm.writeMicroseconds(FL_hip, map(FL_leg.get_hip_angle() - 10, 0, 180, 1000, 2200));
+  pwm.writeMicroseconds(FL_knee, map(FL_leg.get_knee_angle() - 5, 0, 180, 1000, 2200));
 
-    pwm.writeMicroseconds(BR_abad, map(BR_leg.get_abad_angle() - 5, 0, 180, 1000, 2200));
-    pwm.writeMicroseconds(BR_hip, map(BR_leg.get_hip_angle(), 0, 180, 1000, 2200));
-    pwm.writeMicroseconds(BR_knee, map(BR_leg.get_knee_angle() - 5, 0, 180, 1000, 2200));
+  pwm.writeMicroseconds(BR_abad, map(BR_leg.get_abad_angle() - 5, 0, 180, 1000, 2200));
+  pwm.writeMicroseconds(BR_hip, map(BR_leg.get_hip_angle(), 0, 180, 1000, 2200));
+  pwm.writeMicroseconds(BR_knee, map(BR_leg.get_knee_angle() - 4, 0, 180, 1000, 2200));
 
-    pwm.writeMicroseconds(BL_abad, map(BL_leg.get_abad_angle(), 0, 180, 1000, 2200));
-    pwm.writeMicroseconds(BL_hip, map(BL_leg.get_hip_angle() - 10, 0, 180, 1000, 2200));
-    pwm.writeMicroseconds(BL_knee, map(BL_leg.get_knee_angle(), 0, 180, 1000, 2200));
+  pwm.writeMicroseconds(BL_abad, map(BL_leg.get_abad_angle(), 0, 180, 1000, 2200));
+  pwm.writeMicroseconds(BL_hip, map(BL_leg.get_hip_angle() - 12, 0, 180, 1000, 2200));
+  pwm.writeMicroseconds(BL_knee, map(BL_leg.get_knee_angle() + 5, 0, 180, 1000, 2200));
 
     prev_time = current_time;
   }

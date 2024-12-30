@@ -14,7 +14,7 @@ Trajectory::Trajectory(float step_length_init, float step_height_init, float bac
     side_step_height = side_step_height_init;
     side_back_step_depth = side_back_step_depth_init;
     interpolations = 20;
-    speed_factor = 10;
+    speed_factor = 8;
     body_length = 244;
     body_width = 105;
     abad_length = 38.7;
@@ -495,15 +495,15 @@ void Trajectory::setDir(char dir_val)
 void Trajectory::posControl(float pos[3])
 {
     x = -pos[0] / 100.0 * 25;
-    y = -pos[1] / 100.0 * 40;
+    y = -pos[1] / 100.0 * 25;
     z = 20 - pos[2] / 100.0 * 30;
 }
 
 void Trajectory::orientControl(float orient[3])
 {
-    float psi = PI/20 * orient[2]/100.0;
-    float theta = PI/20 * orient[1]/100.0;
-    float phi = PI/20 * orient[0]/100.0;
+    float psi = -PI/10 * orient[2]/100.0;
+    float theta = PI/15 * orient[1]/100.0;
+    float phi = PI/15 * orient[0]/100.0;
 
     int xOffsetDir = 1;
     int yOffsetDir = 1;
@@ -522,7 +522,7 @@ void Trajectory::orientControl(float orient[3])
         yOffsetDir = 1;
     }
 
-    Matrix<4> d_L0 = {-xOffsetDir*abad_length, 0, -ground_depth, 1};
+    Matrix<4> d_L0 = {-xOffsetDir*abad_length, 0, -ground_depth + 20, 1};
 
     Matrix<4, 4> H_L0_B0 = {1, 0, 0, xOffsetDir*body_width/2.0, 0, 1, 0, yOffsetDir*body_length/2.0, 0, 0, 1, 0, 0, 0, 0, 1};
     Matrix<4, 4> H_B3_L1 = {1, 0, 0, -xOffsetDir*body_width/2.0, 0, 1, 0, -yOffsetDir*body_length/2.0, 0, 0, 1, 0, 0, 0, 0, 1};
